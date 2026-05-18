@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Form</title>
+</head>
+<body>
+
+<h2>Patient Registration Form</h2>
+
+<form action="/patient" method="post">
+
+ 	<p style="color:green"> [[${msg}]]</p>
+    <p>
+        Name:<br>
+        <input type="text" name="name" required>
+    </p>
+
+    <p>
+        Gender:<br>
+        <input type="radio" name="gender" value="Male"> Male
+        <input type="radio" name="gender" value="Female"> Female
+    </p>
+
+    <p>
+        Marital Status:<br>
+        <input type="radio" name="maritalStatus" value="Single"> Single
+        <input type="radio" name="maritalStatus" value="Married"> Married
+    </p>
+
+    <p>
+        Address:<br>
+        <textarea name="address" rows="4" cols="30"></textarea>
+    </p>
+
+    <button type="submit">Submit</button>
+
+</form>
+
+</body>
+</html>

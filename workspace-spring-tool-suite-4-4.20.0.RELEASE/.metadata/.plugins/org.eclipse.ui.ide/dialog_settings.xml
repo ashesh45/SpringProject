@@ -42,6 +42,9 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="D:\Spring_CRUD"/>
+			<item value="D:\Blog_Application_Api"/>
+			<item value="D:\blog api\Blog_Application_Api"/>
 			<item value="D:\springcore\Spring_Core"/>
 			<item value="C:\Users\Ashesh Maharjan\OneDrive\Documents\New folder\PDF_Generation"/>
 			<item value="C:\Users\Ashesh Maharjan\OneDrive\Documents\New folder\ExcelCreation"/>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+  <th:block th:insert = "header.html"></th:block>
+<div class="container mt-5">
+
+    <div class="department-card">
+
+        <h1 class="title">Profile</h1>
+
+            <!-- Department Name -->
+            <div class="mb-4">
+                <div class = "col-4">FirstName</div>
+                 <div class = "col-4">[[${session.activeuser.fname}]]</div>
+                
+            </div>
+
+                   <div class="mb-4">
+                <div class = "col-4">LastName</div>
+                 <div class = "col-4">[[${session.activeuser.lname}]]</div>
+            
+            
+               </div>
+
+                   <div class="mb-4">
+                <div class = "col-4">Username</div>
+                 <div class = "col-4">[[${session.activeuser.username}]]</div>
+            </div>
+    
+    </div>
+
+</div>
+
+
+
+</body>
+</html>

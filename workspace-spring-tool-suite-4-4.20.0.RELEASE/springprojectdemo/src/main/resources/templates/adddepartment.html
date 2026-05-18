@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+    <title>Department Form</title>
+
+  <th:block th:insert = "header.html"></th:block>
+
+</head>
+
+
+<body>
+
+
+<div class="container mt-5">
+
+    <div class="department-card">
+
+        <h1 class="title">Add Department</h1>
+
+        <!-- Success Message -->
+        <p class="text-success text-center fw-bold">
+            [[${msg}]]
+        </p>
+
+        <form action="/add-department" method="post">
+
+            <!-- Department Name -->
+            <div class="mb-4">
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Enter Department Name"
+                       required
+                       minlength="2">
+            </div>
+
+            <!-- Head of Department -->
+            <div class="mb-4">
+                <input type="text"
+                       name="hod"
+                       class="form-control"
+                       placeholder="Head of Department"
+                       required>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-4">
+                <input type="tel"
+                       name="phone"
+                       class="form-control"
+                       placeholder="Phone Number"
+                       pattern="[0-9]{10}"
+                       required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="btn btn-primary w-100">
+                Register
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+</body>
+</html>

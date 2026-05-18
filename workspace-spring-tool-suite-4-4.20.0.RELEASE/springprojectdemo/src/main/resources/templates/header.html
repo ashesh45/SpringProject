@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Navbar</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+<!-- Icons -->
+<link rel="stylesheet"
+href="/fonts/material-icon/css/material-design-iconic-font.min.css">
+
+<!-- Main CSS -->
+<link rel="stylesheet"
+href="/css/style.css">
+
+</head>
+<body>
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    
+    <a class="navbar-brand" href="#">Spring project</a>
+
+    <button class="navbar-toggler" type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent">
+
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse"
+         id="navbarSupportedContent">
+
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home</a>
+            </li>
+
+             <li class="nav-item dropdown active">
+
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="employeeDropdown"
+                   role="button"
+                   data-toggle="dropdown">
+
+                    Employee
+                </a>
+
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/addemp">Add Employee</a>
+                    <a class="dropdown-item" href="/emplist">Employee List</a>
+                </div>
+
+            </li>
+
+            <li class="nav-item dropdown active">
+
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="departmentDropdown"
+                   role="button"
+                   data-toggle="dropdown">
+
+                    Department
+                </a>
+
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/add-department">Add Department</a>
+                    <a class="dropdown-item" href="/departmentlist">Department List</a>
+                </div>
+
+            </li>
+            
+            <li class="nav-item active">
+                <a class="nav-link" href="/gallery">Gallery</a>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" href="/upload">Upload</a>
+            </li>
+            
+            <li class="nav-item active">
+                <a class="nav-link" href="/profile">Profile</a>
+            </li>
+            
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Contact</a>
+            </li>
+
+        </ul>
+
+       <form class="d-flex align-items-center gap-3">
+    
+        <h4 class="mb-0 text-primary fw-bold">
+        Welcome, <span class="text-light">[[${session.activeuser.username}]]</span>
+    </h4>
+
+   <a href="/logout"
+   class="btn btn-danger btn-sm px-3"
+   onclick="return confirm('Are you sure you want to logout?')">
+    Logout
+</a>
+
+</form>
+    </div>
+
+</nav>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

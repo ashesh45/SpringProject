@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Form</title>
+</head>
+<body>
+
+<h3>Appointment</h3>
+
+    <form action="/appointment" method="post">
+    <table border="1" cellpadding="10">
+        <tr>
+               <tr>
+            <td>Doctor Name</td>
+            <td><input type="text" name="doctorName"></td>
+        </tr>
+        </tr>
+
+        <tr>
+            <td>Date</td>
+            <td><input type="date" name="date"></td>
+        </tr>
+
+        <tr>
+            <td>No. of Slots</td>
+            <td><input type="number" name="slot"></td>
+        </tr>
+
+     
+
+        <tr>
+            <td>Consultation Fee</td>
+            <td><input type="text" name="fee"></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" align="center">
+                <button type="submit">Add</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>

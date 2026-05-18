@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+ <style>
+        body{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container{
+            width: 500px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+
+        h2, h3{
+            text-align: center;
+        }
+
+        label{
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, select{
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .btn{
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover{
+            background-color: darkblue;
+        }
+    </style>
+<title>Insert title here</title>
+</head>
+<body>
+<div class="container">
+
+    <h2>Update Employee</h2>
+
+   <form th:action="@{/updateemp}" method="post" th:object="${employee}">
+
+    <input type="hidden" th:field="*{id}">
+
+    <!-- First Name -->
+    <label>First Name</label>
+    <input type="text" th:field="*{fname}" required>
+
+    <!-- Last Name -->
+    <label>Last Name</label>
+    <input type="text" th:field="*{lname}" required>
+
+    <!-- Email -->
+    <label>Email</label>
+    <input type="email" th:field="*{email}" required>
+
+    <!-- Phone -->
+    <label>Phone</label>
+    <input type="text" th:field="*{phone}" required>
+
+    <!-- Gender -->
+    <label>Gender</label>
+    <select th:field="*{gender}">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <!-- DOB -->
+    <label>Date of Birth</label>
+    <input type="date" th:field="*{dob}" required>
+
+    <!-- Company -->
+    <label>Company</label>
+    <input type="text" th:field="*{company}" required>
+
+    <!-- Post -->
+    <label>Post</label>
+    <input type="text" th:field="*{post}" required>
+
+    <!-- Salary -->
+    <label>Salary</label>
+    <input type="number" th:field="*{salary}" required>
+
+    <!-- Join Date -->
+    <label>Join Date</label>
+    <input type="date" th:field="*{joinDate}" required>
+    
+ 
+<label>Department</label>
+
+<select th:field="*{departments}">
+
+    <option value="">Select</option>
+
+    <option th:each="d : ${dlist}"
+            th:value="${d.id}"
+            th:text="${d.name}">
+    </option>
+
+</select>
+
+<div style="display:flex; gap:20px; align-items:center;">
+
+    <label>
+        <input type="checkbox" name="projects" value="Project 1">
+        Project 1
+    </label>
+
+    <label>
+        <input type="checkbox" name="projects" value="Project 2">
+        Project 2
+    </label>
+
+    <label>
+        <input type="checkbox" name="projects" value="Project 3">
+        Project 3
+    </label>
+
+</div>
+
+    <h3>Address Details</h3>
+
+    <label>City</label>
+    <input type="text" th:field="*{address.name}">
+
+    <label>State</label>
+    <input type="text" th:field="*{address.state}">
+
+    <label>Zip Code</label>
+    <input type="text" th:field="*{address.zipcode}">
+
+    <button type="submit">Update</button>
+
+</form>
+</div>
+</body>
+</html>

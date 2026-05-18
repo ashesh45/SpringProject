@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/gallery.css">
+</head>
+<body>
+
+<div th:insert="header.html :: navbar"></div>
+
+<div class="gallery-container" style="max-width:560px;">
+
+    <h2>Upload Identity</h2>
+	<p style="color:green"> [[${msg}]]</p>
+
+    </p>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+
+        <div class="upload-box">
+            <div class="upload-icon">&#128206;</div>
+            <p class="upload-text">Choose a file to upload</p>
+            <input type="file" name="image" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Upload</button>
+
+    </form>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

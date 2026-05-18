@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:insert = "header.html"></th:block>
+<div class="container mt-5">
+
+    <div class="department-card">
+
+        <h1 class="title">Gallery Page</h1>
+
+ 
+
+      <span th:each="imgName : ${imgList}"> <img th:src="@{'/images/' + ${imgName}}" width="300" height="300" /> </span>
+
+</div>
+
+</div>
+
+
+</body>
+</html>
