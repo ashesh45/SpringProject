@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+  <th:block th:insert = "header.html"></th:block>
+  
+  <p style="color:green"> [[${msg}]]</p>
+ <form action="/contact" method="post">
+
+            <input type="text" name="fullname" placeholder="Enter Full Name" required>
+
+            <input type="toEmail" name="email" placeholder="Enter Email" required>
+
+            <input type="text" name="subject" placeholder="Enter Subject">
+
+            <textarea name="message" rows="5" placeholder="Enter Message"></textarea>
+
+            <button type="submit">Send Message</button>
+
+        </form>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
