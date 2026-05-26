@@ -1,14 +1,14 @@
 package com.bway.springdemo.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.bway.springdemo.model.FinanceResponse;
-import com.bway.springdemo.model.Story;
 
 
-public interface FinanceRepository extends JpaRepository <FinanceResponse,Long>  {
+public interface FinanceRepository extends JpaRepository <FinanceResponse,Long> {
 
-
-
+	Optional<FinanceResponse> findTopByOrderByIdDesc();
 
 }

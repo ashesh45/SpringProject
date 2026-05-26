@@ -96,12 +96,8 @@ public class EmployeeRestController {
                         FinanceResponse.class
                 );
 
-        if (response != null) {
-            financeRepo.save(response);
+            financeRepo.saveAll(List.of(response));
             return "success";
-        }
-
-        return "failed to load finance data";
     }
         
 }

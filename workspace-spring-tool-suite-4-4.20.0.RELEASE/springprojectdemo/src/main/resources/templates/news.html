@@ -11,61 +11,141 @@
             max-width: 960px;
             margin: 30px auto 50px;
         }
+        .channel-badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .meta-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .story-card {
+            background: #fff;
             border: 1px solid #e9edf2;
             border-radius: 10px;
             padding: 20px 24px;
-            margin-bottom: 20px;
-            background: #fff;
-            transition: box-shadow 0.2s ease;
+            margin-bottom: 18px;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .story-card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #d1d9e6;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
         .story-card h3 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             color: #1e293b;
-            margin: 0 0 10px;
+            margin: 0 0 8px;
             border: none;
             padding: 0;
+            line-height: 1.4;
         }
-        .story-card p {
+        .story-card .summary {
             color: #475569;
             font-size: 14px;
             line-height: 1.6;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-        .story-card a.read-more {
-            display: inline-block;
+        .story-card .topic-ne {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border-left: 3px solid #0d6efd;
+        }
+        .story-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .read-more {
             font-size: 13px;
             font-weight: 600;
             color: #0d6efd;
             text-decoration: none;
         }
-        .story-card a.read-more:hover {
+        .read-more:hover {
             text-decoration: underline;
         }
         .sources {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid #f1f5f9;
+            gap: 10px;
+            align-items: center;
+        }
+        .source-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
         }
         .source-item {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #64748b;
+            gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            background: #f8fafc;
+            padding: 3px 10px 3px 2px;
+            border-radius: 20px;
+            border: 1px solid #e9edf2;
+        }
+        .source-letter {
+            display: inline-flex;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .source-item img {
-            width: 28px;
-            height: 28px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .story-card {
+                padding: 16px;
+            }
+            .story-card h3 {
+                font-size: 15px;
+            }
+            .story-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -77,28 +157,37 @@
 
     <h2>Finance News</h2>
 
-    <div th:each="response : ${clist}">
+    <div th:if="${response != null}">
 
-        <p class="text-muted mb-2">
-            <span th:text="${response.channel}"></span>
-            &mdash;
-            <span th:text="${response.story_count}"></span> stories
-            &middot;
-            <span th:text="${response.generated_at}"></span>
-        </p>
+        <div class="channel-badge" th:text="${response.channel}"></div>
+
+        <div class="meta-info">
+            <span>&#9201; <span th:text="${response.generated_at}"></span></span>
+            <span>&#128240; <span th:text="${response.story_count}"></span> stories</span>
+        </div>
 
         <div th:each="story : ${response.stories}" class="story-card">
 
             <h3 th:text="${story.topic_en}"></h3>
 
-            <p th:text="${story.summary_en}"></p>
+            <div class="topic-ne" th:if="${story.topic_ne != null}" th:text="${story.topic_ne}"></div>
 
-            <a th:href="${story.url}" class="read-more" target="_blank">Read more &rarr;</a>
+            <div class="summary" th:text="${story.summary_en}"></div>
 
-            <div class="sources" th:if="${story.sources != null and !story.sources.isEmpty()}">
-                <div class="source-item" th:each="source : ${story.sources}">
-                    <img th:src="${source.image_url}" alt="" />
-                    <span th:text="${source.publisher}"></span>
+            <div class="story-footer">
+                <a th:href="${story.url}" class="read-more" target="_blank">Read full story &rarr;</a>
+
+                <div class="sources" th:if="${story.sources != null and !story.sources.isEmpty()}">
+                    <span class="source-label">Sources:</span>
+                    <div class="source-item" th:each="source : ${story.sources}">
+                        <span class="source-letter"
+                              th:text="${#strings.substring(source.publisher, 0, 1)}"
+                              th:style="'background:' + ${source.image_url != null ? '#e9edf2' : '#0d6efd'} + '; color:' + ${source.image_url != null ? '#475569' : '#fff'} + ';'"></span>
+                        <img th:src="${#strings.substringBefore(source.image_url, '?')}" alt=""
+                             th:if="${source.image_url != null}"
+                             onerror="this.style.display='none'" />
+                        <span th:text="${source.publisher}"></span>
+                    </div>
                 </div>
             </div>
 
@@ -106,7 +195,7 @@
 
     </div>
 
-    <div class="text-muted text-center mt-4" th:if="${#lists.isEmpty(clist)}">
+    <div class="text-muted text-center mt-4" th:if="${response == null}">
         No news available.
     </div>
 

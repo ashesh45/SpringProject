@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
@@ -27,7 +28,8 @@ public class Cart {
 	    private Date date;
 
 
-	    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-	    private List<CartProduct> products;
+	    @OneToMany(cascade = CascadeType.ALL)
+	    @JoinColumn(name = "car_id")
+	    private List<Car> products;
 
 }

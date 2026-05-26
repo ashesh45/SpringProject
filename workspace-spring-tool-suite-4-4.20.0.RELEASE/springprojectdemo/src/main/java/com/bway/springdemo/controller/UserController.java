@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 
 import com.bway.springdemo.model.User;
+import com.bway.springdemo.repository.ProductRepository;
 import com.bway.springdemo.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,9 +23,21 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private ProductRepository ProductRepo;
+	
 
 	
 	@GetMapping("/")	
+	public String getIndex(Model model) {
+		model.addAttribute("pList", ProductRepo.findAll());
+		return "customerhome";
+	}
+	
+	
+	
+	
+	@GetMapping("/login")	
 	public String getLogin() {
 		
 		return "login";
@@ -34,20 +47,25 @@ public class UserController {
 	
 	@PostMapping("/login")
 	public String postlogin(@ModelAttribute User user, Model model, HttpSession session) {
-		
-		   User User = userService.userLogin(user.getUsername(), user.getPassword());
 
-		    if(User != null) {
-		       // model.addAttribute("user", User);
-		        model.addAttribute("uname", user.getUsername());
-		        session.setAttribute("activeuser", User);
-		        session.setMaxInactiveInterval(500);
-		        return "department"; // login success
-		    } else {
-		        model.addAttribute("error", "Invalid email or password");
-		        return "login"; // login fail
-		    }
-		    
+	    User dbUser = userService.userLogin(user.getUsername(), user.getPassword());
+
+	    if (dbUser != null) {
+
+	        model.addAttribute("uname", dbUser.getUsername());
+	        session.setAttribute("activeuser", dbUser);
+	        session.setMaxInactiveInterval(500);
+
+	        if ("CUSTOMER".equalsIgnoreCase(dbUser.getRole())) {
+	        	model.addAttribute("pList", ProductRepo.findAll());
+	            return "customerhome";
+	        }
+
+	        return "department";
+	    } else {
+	        model.addAttribute("error", "Invalid email or password");
+	        return "login";
+	    }
 	}
 	
 	

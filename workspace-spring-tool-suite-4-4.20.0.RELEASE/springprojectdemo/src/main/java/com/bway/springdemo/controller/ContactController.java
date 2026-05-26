@@ -52,12 +52,12 @@ public class ContactController {
 	
 	@GetMapping("/news")
 	public String getNews(Model model, HttpSession session) {
-		
-        if (session.getAttribute("activeuser") == null) {
-            return "redirect:/login";
-        }
 
-	    model.addAttribute("clist", financeRepo.findAll());
-	    return "news";
+		if (session.getAttribute("activeuser") == null) {
+			return "redirect:/login";
+		}
+
+		model.addAttribute("response", financeRepo.findTopByOrderByIdDesc().orElse(null));
+		return "news";
 	}
 }

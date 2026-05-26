@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class CartProduct {
+public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,6 @@ public class CartProduct {
 
     private Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+
 
 }

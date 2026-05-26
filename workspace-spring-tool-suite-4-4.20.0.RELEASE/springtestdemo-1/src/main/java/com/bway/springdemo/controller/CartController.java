@@ -1,11 +1,13 @@
 package com.bway.springdemo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.bway.springdemo.repository.CartRepository;
 
+@Controller
 public class CartController {
 	
 	
@@ -17,7 +19,7 @@ public class CartController {
 	public String getProductGallery(Model model) {
 
 	    model.addAttribute("clist", cartRepo.findAll());
-	    return "Cart";
+	    return "cart";
 	}
 
 }
