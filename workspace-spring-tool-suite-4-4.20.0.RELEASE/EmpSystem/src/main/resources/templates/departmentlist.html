@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Department List - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>Department List</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>All Departments</h2>
+            <a href="/add-department" class="btn btn-primary">+ Add Department</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(deptList)}" class="empty-state">
+            <div class="empty-icon">&#127970;</div>
+            <p>No departments found.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(deptList)}" class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Department Name</th>
+                        <th>HOD</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="d : ${deptList}">
+                        <td th:text="${d.id}"></td>
+                        <td th:text="${d.deptName}"></td>
+                        <td th:text="${d.hod}"></td>
+                        <td th:text="${d.phone}"></td>
+                        <td class="action-cell">
+                            <a th:href="@{/editdepartment/{id}(id=${d.id})}" class="btn btn-warning btn-sm">Edit</a>
+                            <a th:href="@{/deleteDepartment/{id}(id=${d.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this department?')">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>

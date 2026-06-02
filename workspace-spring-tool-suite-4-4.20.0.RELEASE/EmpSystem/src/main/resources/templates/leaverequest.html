@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Leave Request - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>Leave Request</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Leave Application Form</h2>
+        </div>
+
+        <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <form th:action="@{/employee/leave-request}" th:object="${leaveRequest}" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="leaveType">Leave Type</label>
+                    <select id="leaveType" th:field="*{leaveType}" class="form-control" required>
+                        <option value="">Select Leave Type</option>
+                        <option value="CASUAL">CASUAL</option>
+                        <option value="SICK">SICK</option>
+                        <option value="ANNUAL">ANNUAL</option>
+                        <option value="UNPAID">UNPAID</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" th:field="*{startDate}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" th:field="*{endDate}" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Reason</label>
+                <textarea id="reason" rows="4" th:field="*{reason}" class="form-control" placeholder="Enter the reason for your leave"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply Leave</button>
+            <a href="/dashboard" class="btn btn-outline">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p> Welcome :[[${session.loggedInUser.username}]]</p>
+    </div>
+        
+    <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">&#128101;</div>
+            <div class="stat-value" th:text="${empCount}">0</div>
+            <div class="stat-label">Total Employees</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#127970;</div>
+            <div class="stat-value" th:text="${deptCount}">0</div>
+            <div class="stat-label">Departments</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#128203;</div>
+            <div class="stat-value" th:text="${leaveCount}">0</div>
+            <div class="stat-label">Leave Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#9203;</div>
+            <div class="stat-value" th:text="${pendingCount}">0</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+    </div>
+
+    <h2 style="font-size:20px; font-weight:700; color:#1a237e; margin-bottom:16px;">Quick Actions</h2>
+    <div class="quick-links">
+        <a href="/addemp" class="quick-link-card">
+            <div class="ql-icon">&#10133;</div>
+            <div class="ql-title">Add Employee</div>
+        </a>
+        <a href="/emplist" class="quick-link-card">
+            <div class="ql-icon">&#128101;</div>
+            <div class="ql-title">Employee List</div>
+        </a>
+        <a href="/add-department" class="quick-link-card">
+            <div class="ql-icon">&#127970;</div>
+            <div class="ql-title">Add Department</div>
+        </a>
+        <a href="/departmentlist" class="quick-link-card">
+            <div class="ql-icon">&#128203;</div>
+            <div class="ql-title">Department List</div>
+        </a>
+        <a href="/employee/leave-request" class="quick-link-card">
+            <div class="ql-icon">&#128221;</div>
+            <div class="ql-title">Apply Leave</div>
+        </a>
+        <a href="/employee/all-leaves" class="quick-link-card">
+            <div class="ql-icon">&#128196;</div>
+            <div class="ql-title">All Leaves</div>
+        </a>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>

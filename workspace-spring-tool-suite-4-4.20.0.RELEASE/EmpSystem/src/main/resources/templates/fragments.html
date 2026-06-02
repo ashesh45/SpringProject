@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ===== Sidebar Fragment ===== -->
+<nav th:fragment="sidebar" class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <h2>EmpSystem</h2>
+        <p>Employee Management</p>
+    </div>
+
+    <div class="sidebar-nav">
+
+        <!-- Dashboard -->
+        <div class="sidebar-item">
+            <a href="/dashboard" class="sidebar-link">
+                <span class="icon">&#9679;</span>
+                <span>Dashboard</span>
+            </a>
+        </div>
+
+        <!-- Employee Dropdown -->
+        <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#128101;</span>
+                <span>Employee</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+            <div class="sidebar-dropdown">
+                <a href="/addemp"><span class="icon">+</span> Add Employee</a>
+                <a href="/emplist"><span class="icon">&#128203;</span> Employee List</a>
+            </div>
+        </div>
+
+        <!-- Department Dropdown -->
+        <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#127970;</span>
+                <span>Department</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+            <div class="sidebar-dropdown">
+                <a href="/add-department"><span class="icon">+</span> Add Department</a>
+                <a href="/departmentlist"><span class="icon">&#128203;</span> Department List</a>
+            </div>
+        </div>
+
+        <!-- Leave Dropdown -->
+        <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#128221;</span>
+                <span>Leave</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+            <div class="sidebar-dropdown">
+                <a href="/employee/leave-request"><span class="icon">&#128221;</span> Apply Leave</a>
+                <a href="/employee/myleaves"><span class="icon">&#128196;</span> My Leaves</a>
+                <a href="/employee/all-leaves"><span class="icon">&#128203;</span> All Leaves</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+        <a href="/login" class="sidebar-link">
+            <span class="icon">&#128682;</span>
+            <span>Logout</span>
+        </a>
+    </div>
+</nav>
+
+<!-- ===== Sidebar Toggle Button (mobile) ===== -->
+<div th:fragment="sidebar-toggle">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+</div>
+
+<!-- ===== Sidebar + Toggle Init Script ===== -->
+<script th:fragment="sidebar-script">
+function toggleDropdown(el) {
+    var dropdown = el.nextElementSibling;
+    var arrow = el.querySelector('.arrow');
+    if (dropdown) {
+        dropdown.classList.toggle('open');
+        if (arrow) arrow.classList.toggle('open');
+    }
+}
+
+function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('show');
+}
+
+// Auto-open active dropdown based on current URL
+document.addEventListener('DOMContentLoaded', function() {
+    var path = window.location.pathname;
+    var links = document.querySelectorAll('.sidebar-dropdown a');
+    links.forEach(function(link) {
+        if (link.getAttribute('href') === path) {
+            var dropdown = link.closest('.sidebar-dropdown');
+            if (dropdown) {
+                dropdown.classList.add('open');
+                var parentLink = dropdown.previousElementSibling;
+                if (parentLink) {
+                    var arrow = parentLink.querySelector('.arrow');
+                    if (arrow) arrow.classList.add('open');
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>

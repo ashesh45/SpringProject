@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Employee - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>Add Employee</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Add New Employee</h2>
+        </div>
+
+        <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <form th:action="@{/addemp}" th:object="${employee}" method="post">
+            <h3 class="form-section-title">Personal Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fname">First Name</label>
+                    <input type="text" id="fname" th:field="*{fname}" class="form-control" placeholder="Enter first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="lname">Last Name</label>
+                    <input type="text" id="lname" th:field="*{lname}" class="form-control" placeholder="Enter last name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="Enter email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" th:field="*{phone}" class="form-control" placeholder="Enter phone number" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" th:field="*{gender}" class="form-control">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" th:field="*{dob}" class="form-control" required>
+                </div>
+            </div>
+
+            <h3 class="form-section-title">Employment Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="company">Company</label>
+                    <input type="text" id="company" th:field="*{company}" class="form-control" placeholder="Enter company name" required>
+                </div>
+                <div class="form-group">
+                    <label for="post">Post</label>
+                    <input type="text" id="post" th:field="*{post}" class="form-control" placeholder="Enter job post" required>
+                </div>
+                <div class="form-group">
+                    <label for="salary">Salary</label>
+                    <input type="number" id="salary" th:field="*{salary}" class="form-control" placeholder="Enter salary" required>
+                </div>
+                <div class="form-group">
+                    <label for="joinDate">Join Date</label>
+                    <input type="date" id="joinDate" th:field="*{joinDate}" class="form-control" required>
+                </div>
+                
+                      <div class="form-group">
+                <label>Department</label>
+                <select name="departments">
+                    <option value="">Select</option>
+                    <option th:each="d : ${dlist}" th:value="${d.id}" th:text="${d.name}"></option>
+                </select>
+            </div>
+            </div>
+
+            <h3 class="form-section-title">Login Credentials</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter a password" required>
+                </div>
+            </div>
+
+            <h3 class="form-section-title">Address Details</h3>
+            <div class="address-grid">
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" th:field="*{address.name}" class="form-control" placeholder="Enter city">
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" th:field="*{address.state}" class="form-control" placeholder="Enter state">
+                </div>
+                <div class="form-group">
+                    <label for="zipcode">Zip Code</label>
+                    <input type="text" id="zipcode" th:field="*{address.zipcode}" class="form-control" placeholder="Enter zip code">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Employee</button>
+        </form>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>

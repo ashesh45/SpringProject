@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>EmpSystem</h1>
+            <p>Employee Management System</p>
+        </div>
+
+        <div th:if="${msg}" class="alert alert-error" th:text="${msg}"></div>
+        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
+
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="/Signup">Sign Up</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -99,6 +99,8 @@ public class EmployeeController {
 
 	    return "emplist";
 	}
+	
+	
     @GetMapping("/deleteemp/{id}")
     public String deleteDepartment(@PathVariable int id) {
 

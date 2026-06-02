@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Department - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>Edit Department</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Update Department</h2>
+        </div>
+
+        <form th:action="@{/updatedepartment}" method="post" th:object="${department}">
+            <input type="hidden" name="id" th:value="${department.id}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department Name</label>
+                    <input type="text" th:field="*{deptName}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>HOD</label>
+                    <input type="text" th:field="*{hod}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" th:field="*{phone}" class="form-control" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Department</button>
+            <a href="/departmentlist" class="btn btn-outline">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>
