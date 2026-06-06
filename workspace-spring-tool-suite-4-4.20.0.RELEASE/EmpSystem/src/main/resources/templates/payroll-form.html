@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<form action="/payroll" method="post" th:object="${payroll}">
+
+           <div class="form-group">
+                <label>Employee Name</label>
+                <select name="employeeId">
+                    <option value="">Select</option>
+                    <option th:each="e : ${Emplist}" th:value="${e.id}" th:text="${e.fname}"></option>
+                </select>
+           
+
+    <label for="basicSalary">Basic Salary</label>
+    <input type="number" id="basicSalary" th:field="*{basicSalary}">
+
+
+
+    <label for="basicSalary">Over Time Hours</label>
+    <input type="number" id="overtimeHours" th:field="*{overtimeHours}">
+
+
+
+    <label for="basicSalary">Over time Rate</label>
+    <input type="number" id="overtimeRate" th:field="*{overtimeRate}">
+
+
+    <label for="basicSalary">Bonus</label>
+    <input type="number" id="bonus" th:field="*{bonus}">
+
+
+ 
+    <label for="basicSalary">Deduction</label>
+    <input type="number" id="deduction" th:field="*{deduction}">
+
+
+
+    <label for="basicSalary">Salary Month</label>
+    <input type="date" id="salaryMonth" th:field="*{salaryMonth}">
+</div>
+
+
+    <button type="submit">Process Payroll</button>
+</form>
+
+
+</body>
+</html>

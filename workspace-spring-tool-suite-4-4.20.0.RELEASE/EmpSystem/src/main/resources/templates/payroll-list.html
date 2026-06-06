@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Payroll List</title>
+
+</head>
+<body>
+
+<h2>Payroll List</h2>
+
+<table>
+    <thead>
+        <tr>
+             <th>ID</th>
+            <th>Employee Name</th>
+            <th>Basic Salary</th>
+            <th>Allowances</th>
+            <th>Deductions</th>
+            <th>Net Salary</th>
+            <th>Pay Date</th>
+            <th>OvertimeHours</th>
+            <th>OvertimeRate</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="p : ${list}">
+              <td th:text="${p.id}"></td>
+            <td th:text="${p.employee.fname}"></td>
+            <td th:text="${p.basicSalary}"></td>
+            <td th:text="${p.overtimeHours}"></td>
+            <td th:text="${p.overtimeRate}"></td>
+            <td th:text="${p.bonus}"></td>
+            <td th:text="${p.deduction}"></td>
+            <td th:text="${p.netSalary}"></td>
+            <td th:text="${p.salaryMonth}"></td>
+        </tr>
+
+     
+    </tbody>
+</table>
+<a th:href="@{/pdf}" class="btn btn-danger">
+    Export PDF
+</a>
+</body>
+</html>

@@ -580,6 +580,29 @@ table tbody tr:nth-child(even):hover {
     text-decoration: underline;
 }
 
+/* ===== Search Bar ===== */
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 16px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: #fafafa;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #1a237e;
+    box-shadow: 0 0 0 3px rgba(26,35,126,0.1);
+    background: #fff;
+}
+
 /* ===== Empty State ===== */
 .empty-state {
     text-align: center;

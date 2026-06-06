@@ -45,6 +45,18 @@
             </div>
         </div>
 
+        <!-- Attendance Dropdown -->
+        <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#9200;</span>
+                <span>Attendance</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+            <div class="sidebar-dropdown">
+                <a href="/attendance"><span class="icon">&#128198;</span> My Attendance</a>
+            </div>
+        </div>
+
         <!-- Leave Dropdown -->
         <div class="sidebar-item">
             <div class="sidebar-link" onclick="toggleDropdown(this)">
@@ -60,6 +72,31 @@
         </div>
 
     </div>
+           <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#9200;</span>
+                <span>Payroll Management</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+                <div class="sidebar-dropdown">
+                <a href="/payroll"><span class="icon">&#128221;</span> Payroll</a>
+                <a href="/payroll/list"><span class="icon">&#128196;</span> All payroll list</a>
+                <a href="/mypayroll"><span class="icon">&#128203;</span> My Payroll</a>
+            </div>
+                
+        </div>
+
+   
+        <div class="sidebar-item">
+            <div class="sidebar-link" onclick="toggleDropdown(this)">
+                <span class="icon">&#9200;</span>
+                <span>My Profile</span>
+                <span class="arrow">&#9654;</span>
+            </div>
+            <div class="sidebar-dropdown">
+                <a href="/profile"><span class="icon">&#128198;</span> My Profile</a>
+            </div>
+        </div>
 
     <div class="sidebar-footer">
         <a href="/login" class="sidebar-link">
@@ -93,7 +130,6 @@ function toggleSidebar() {
     if (overlay) overlay.classList.toggle('show');
 }
 
-// Auto-open active dropdown based on current URL
 document.addEventListener('DOMContentLoaded', function() {
     var path = window.location.pathname;
     var links = document.querySelectorAll('.sidebar-dropdown a');

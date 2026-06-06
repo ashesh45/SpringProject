@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.model.LeaveRequest;
+import com.example.empsystem.model.Payroll;
 import com.example.empsystem.repository.EmployeeRepository;
+import com.example.empsystem.repository.PayrollRepository;
 import com.example.empsystem.service.LeaveService;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +29,7 @@ public class LeaveRequestController {
 	
 	@Autowired
 	private EmployeeRepository empRepo;
+	
 
 	
 	
@@ -76,4 +79,6 @@ public class LeaveRequestController {
 
 	      return "myleaves";
 	  }
+	  
+
 }

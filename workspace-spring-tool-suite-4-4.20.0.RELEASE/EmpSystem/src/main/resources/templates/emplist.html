@@ -22,6 +22,10 @@
             <a href="/addemp" class="btn btn-primary">+ Add Employee</a>
         </div>
 
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by first name..." onkeyup="searchEmployee()">
+        </div>
+
         <div th:if="${#lists.isEmpty(emplist)}" class="empty-state">
             <div class="empty-icon">&#128101;</div>
             <p>No employees found.</p>
@@ -32,6 +36,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Photo</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Email</th>
@@ -48,6 +53,13 @@
                 <tbody>
                     <tr th:each="e : ${emplist}">
                         <td th:text="${e.id}"></td>
+                        <td>
+                            <img th:if="${e.photo != null}"
+                                 th:src="@{'/images/' + ${e.photo}}"
+                                 alt="Photo"
+                                 style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;">
+                            <span th:if="${e.photo == null}" style="color:#bbb;">&#128100;</span>
+                        </td>
                         <td th:text="${e.fname}"></td>
                         <td th:text="${e.lname}"></td>
                         <td th:text="${e.email}"></td>
@@ -70,6 +82,31 @@
 </div>
 
 <div th:replace="fragments :: sidebar-script"></div>
+
+<script>
+function searchEmployee() {
+    var input = document.getElementById('searchInput');
+    var filter = input.value.toLowerCase();
+    var tbody = document.querySelector('table tbody');
+    var rows = tbody.querySelectorAll('tr');
+
+    var matches = [];
+    var nonMatches = [];
+
+    rows.forEach(function(row) {
+        var fname = row.cells[2].textContent.toLowerCase();
+        if (fname.includes(filter)) {
+            matches.push(row);
+        } else {
+            nonMatches.push(row);
+        }
+    });
+
+    tbody.innerHTML = '';
+    matches.forEach(function(row) { tbody.appendChild(row); });
+    nonMatches.forEach(function(row) { tbody.appendChild(row); });
+}
+</script>
 
 </body>
 </html>

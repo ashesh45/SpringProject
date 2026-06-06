@@ -36,5 +36,17 @@ public class DashboardController {
 		model.addAttribute("pendingCount", leaveRepo.findByStatus(LeaveStatus.PENDING).size());
 		return "dashboard.html";
 	}
+	
+	
+	@GetMapping("/profile")	
+	public String getprofile(HttpSession Session) {
+		 if (Session.getAttribute("loggedInUser") == null) {
+
+		        return "login";
+		    }
+
+		    return "profile";
+		}
+
 
 }

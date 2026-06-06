@@ -42,6 +42,8 @@ public class Employee {
 
     private LocalDate joinDate;
 
+    private String photo;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
