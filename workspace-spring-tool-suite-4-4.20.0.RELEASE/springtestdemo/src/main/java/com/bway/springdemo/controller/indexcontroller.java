@@ -1,19 +1,15 @@
 package com.bway.springdemo.controller;
 
-import org.springframework.stereotype.Controller;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class indexcontroller {
 	
-	
 	@GetMapping("/")
-	public String getIndex() {
-		
-		return "index";
-		
+	public Map<String, String> getIndex() {
+		return Map.of("message", "Welcome to Spring Demo API");
 	}
-	
-	
 
 }

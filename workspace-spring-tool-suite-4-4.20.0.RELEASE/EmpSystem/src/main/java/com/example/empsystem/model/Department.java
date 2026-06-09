@@ -11,10 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
-
+import lombok.ToString;
 
 @Entity
 @Data
+@ToString(exclude = "employees")
 @Table(name = "dept_tbl")
 public class Department {
 	

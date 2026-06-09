@@ -1,13 +1,13 @@
 package com.bway.springdemo.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class GalleryController {
+
 	@GetMapping("/Gallery")
 	public String getGallery() {
-		
 		return "Gallery";
 	}
 

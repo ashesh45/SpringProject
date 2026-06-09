@@ -6,7 +6,6 @@ public interface UserService {
 	
 	void userSignup(User user);
 	User userLogin(String un, String psw);
-
-
+	User findByUsername(String username);
 
 }

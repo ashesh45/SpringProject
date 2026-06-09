@@ -80,5 +80,51 @@ public class AuthController {
 	    mailUtils.sendEmail(email, subject, message);
 	    return "verify-otp";
 	}
+
+	@PostMapping("/verify-otp")
+	public String verifyOtp(@RequestParam("otp") int otp, HttpSession session, Model model) {
+
+	    Integer sessionOtp = (Integer) session.getAttribute("otp");
+	    String email = (String) session.getAttribute("email");
+
+	    if (sessionOtp == null || email == null) {
+	        model.addAttribute("msg", "Session expired. Please try again.");
+	        return "forgot-password";
+	    }
+
+	    if (sessionOtp.equals(otp)) {
+	        return "password-change";
+	    } else {
+	        model.addAttribute("msg", "Invalid OTP. Please try again.");
+	        return "verify-otp";
+	    }
+	}
+
+	@PostMapping("/password-change")
+	public String changePassword(@RequestParam("newPassword") String newPassword,
+	                             @RequestParam("confirmPassword") String confirmPassword,
+	                             HttpSession session, Model model) {
+
+	    String email = (String) session.getAttribute("email");
+
+	    if (email == null) {
+	        model.addAttribute("msg", "Session expired. Please try again.");
+	        return "forgot-password";
+	    }
+
+	    if (!newPassword.equals(confirmPassword)) {
+	        model.addAttribute("msg", "Passwords do not match.");
+	        return "password-change";
+	    }
+
+	    Employee emp = empRepo.findByEmail(email);
+	    if (emp != null) {
+	        emp.setPassword(newPassword);
+	        empRepo.save(emp);
+	    }
+
+	    session.invalidate();
+	    return "redirect:/login";
+	}
 	
 }

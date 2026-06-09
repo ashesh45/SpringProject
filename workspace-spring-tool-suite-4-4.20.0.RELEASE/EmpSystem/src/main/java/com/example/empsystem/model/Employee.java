@@ -15,9 +15,11 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
+@ToString(exclude = "departments")
 @Table(name = "employee_tbl")
 public class Employee {
 
