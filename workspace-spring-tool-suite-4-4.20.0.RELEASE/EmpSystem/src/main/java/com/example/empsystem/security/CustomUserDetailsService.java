@@ -1,5 +1,4 @@
-
-package com.example.springsecurity.service;
+package com.example.empsystem.security;
 
 import java.util.List;
 
@@ -12,38 +11,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.springsecurity.model.MyUser;
-import com.example.springsecurity.repository.UserRepository;
+import com.example.empsystem.model.Employee;
+import com.example.empsystem.repository.EmployeeRepository;
 
 @Service
-public class UserService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
+
 	
 	@Autowired
-	private UserRepository userRepo;
+	private EmployeeRepository empRepo;
 	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 	
    @Override
    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-	   MyUser user = userRepo.findByUsername(username);
-	   if (user == null) {
+	   Employee emp = empRepo.findByUsername(username);
+	   if (emp == null) {
 		   throw new UsernameNotFoundException("User not found: " + username);
 	   }
-	   return new User(user.getUsername(), user.getPassword(),
-			   List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+	   return new User(emp.getUsername(), emp.getPassword(),
+			   List.of(new SimpleGrantedAuthority("ROLE_" + emp.getRole())));
    }		
 	
-
-			
-	public void saveUser(MyUser user) {
-	user.setPassword(passwordEncoder.encode(user.getPassword()));
-	userRepo.save(user);
-
-}
-
 	
-	
-
-
 }

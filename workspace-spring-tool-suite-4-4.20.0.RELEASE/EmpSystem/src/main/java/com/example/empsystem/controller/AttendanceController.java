@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/attendance")
+@RequestMapping("/employee")
 public class AttendanceController {
 
 	@Autowired

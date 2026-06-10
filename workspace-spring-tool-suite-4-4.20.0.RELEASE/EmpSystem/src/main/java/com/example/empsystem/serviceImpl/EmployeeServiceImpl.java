@@ -5,6 +5,7 @@ import com.example.empsystem.controller.AuthController;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.empsystem.model.Employee;
@@ -17,7 +18,8 @@ import com.example.empsystem.service.EmployeeService;
 public class EmployeeServiceImpl implements EmployeeService {
 	
 	
-	
+	 @Autowired
+	 private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private  EmployeeRepository EmpRepo;
@@ -26,6 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public void addEmp(Employee emp) {
+		emp.setPassword(passwordEncoder.encode(emp.getPassword()));
 		  EmpRepo.save(emp);
 		
 	}
@@ -38,7 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public void updateEmp(Employee emp) {
-		// TODO Auto-generated method stub
+		emp.setPassword(passwordEncoder.encode(emp.getPassword()));
 		EmpRepo.save(emp);
 	}
 

@@ -1,9 +1,11 @@
 package com.example.empsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.empsystem.enumm.LeaveStatus;
 import com.example.empsystem.repository.DepartmentRepository;
@@ -13,6 +15,7 @@ import com.example.empsystem.repository.LeaveRequestRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/employee")
 public class DashboardController {
 
 	@Autowired
@@ -23,7 +26,9 @@ public class DashboardController {
 
 	@Autowired
 	private LeaveRequestRepository leaveRepo;
+ 
 
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	@GetMapping("/dashboard")
 	public String dashboard(Model model, HttpSession session) {
 	if(session.getAttribute("loggedInUser") == null) {
@@ -37,7 +42,8 @@ public class DashboardController {
 		return "dashboard.html";
 	}
 	
-	
+
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	@GetMapping("/profile")	
 	public String getprofile(HttpSession Session) {
 		 if (Session.getAttribute("loggedInUser") == null) {

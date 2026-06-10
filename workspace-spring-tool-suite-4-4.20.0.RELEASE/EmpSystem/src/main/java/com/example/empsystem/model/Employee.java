@@ -52,6 +52,7 @@ public class Employee {
 
     @ManyToMany
     private List<Department> departments;
+    private String role;
 
 
 }

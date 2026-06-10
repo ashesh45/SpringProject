@@ -3,12 +3,14 @@ package com.example.empsystem.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.empsystem.model.Department;
 import com.example.empsystem.service.DepartmentService;
@@ -17,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 
 
 @Controller
+@RequestMapping("/admin")
 public class DepartmentController {
 	
 
@@ -32,7 +35,7 @@ public class DepartmentController {
 	    return "addepartment";
 	}
 	
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add-department")
 	public String postdepartment(@ModelAttribute Department department, Model model) {
    
@@ -55,7 +58,7 @@ public class DepartmentController {
 	    }
 	
 	
-	
+	  @PreAuthorize("hasRole('ADMIN')")
 	  @GetMapping("/editdepartment/{id}")
 	    public String editDepartment(@PathVariable int id, Model model) {
 
@@ -67,7 +70,7 @@ public class DepartmentController {
 	    }
 	
 
-	    
+	  @PreAuthorize("hasRole('ADMIN')")
 	    @PostMapping("/updatedepartment")
 	    public String updateDepartment(@ModelAttribute Department department, Model model) {
 
@@ -84,7 +87,7 @@ public class DepartmentController {
 	    }
 	    
 	    
-	    
+	  @PreAuthorize("hasRole('ADMIN')")
 	    @GetMapping("/deleteDepartment/{id}")
 	    public String deleteDepartment(@PathVariable int id) {
 

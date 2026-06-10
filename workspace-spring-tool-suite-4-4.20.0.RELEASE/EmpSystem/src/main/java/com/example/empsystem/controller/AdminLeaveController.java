@@ -1,6 +1,7 @@
 package com.example.empsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,13 +15,17 @@ public class AdminLeaveController {
 
 	@Autowired
 	private LeaveService leaveService;
-
+	
+	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/approve/{id}")
 	public String approveLeave(@PathVariable Long id) {
 		leaveService.approveLeave(id);
 		return "redirect:/employee/all-leaves";
 	}
 
+	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/reject/{id}")
 	public String rejectLeave(@PathVariable Long id) {
 		leaveService.rejectLeave(id);

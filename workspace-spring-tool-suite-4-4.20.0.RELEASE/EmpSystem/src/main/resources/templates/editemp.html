@@ -21,7 +21,7 @@
             <h2>Update Employee</h2>
         </div>
 
-        <form th:action="@{/updateemp}" method="post" th:object="${employee}" enctype="multipart/form-data">
+        <form th:action="@{/admin/updateemp}" method="post" th:object="${employee}" enctype="multipart/form-data">
             <input type="hidden" th:field="*{id}">
 
             <h3 class="form-section-title">Personal Information</h3>

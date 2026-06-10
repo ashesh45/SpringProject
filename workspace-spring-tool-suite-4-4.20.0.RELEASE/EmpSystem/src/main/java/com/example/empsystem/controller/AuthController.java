@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.empsystem.model.Employee;
@@ -17,9 +18,12 @@ import com.example.empsystem.utils.MailUtils;
 
 import java.util.Random;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/employee")
 public class AuthController {
 	
 	
@@ -31,6 +35,9 @@ public class AuthController {
 	
 	@Autowired
 	private MailUtils mailUtils;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	
 	@GetMapping("/login")
@@ -44,9 +51,9 @@ public class AuthController {
 	@PostMapping("/login")
 	public String postlogin(@ModelAttribute Employee e, Model model, HttpSession session) {
 
-	    Employee emp = empRepo.findByUsernameAndPassword(e.getUsername(),e.getPassword());
-	          
-	    if (emp != null) {
+	    Employee emp = empRepo.findByUsername(e.getUsername());
+
+	    if (emp != null && passwordEncoder.matches(e.getPassword(), emp.getPassword())) {
 	        session.setAttribute("loggedInUser", emp);
 	        return "redirect:/dashboard";
 	    }
@@ -119,7 +126,7 @@ public class AuthController {
 
 	    Employee emp = empRepo.findByEmail(email);
 	    if (emp != null) {
-	        emp.setPassword(newPassword);
+	        emp.setPassword(passwordEncoder.encode(newPassword));
 	        empRepo.save(emp);
 	    }
 

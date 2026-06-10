@@ -9,12 +9,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,7 @@ import com.example.empsystem.service.EmployeeService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/admin")
 public class EmployeeController {
 
 	@Autowired
@@ -38,15 +41,16 @@ public class EmployeeController {
 	private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
 
 	@GetMapping("/addemp")
-	public String openAddEmpPage(Model model, HttpSession session) {
-		if (session.getAttribute("loggedInUser") == null) {
-			return "login";
-		}
+	public String openAddEmpPage(Model model) {
+//		if (session.getAttribute("loggedInUser") == null) {
+//			return "login";
+//		}
 		model.addAttribute("employee", new Employee());
 		model.addAttribute("dlist", deptService.getAllDept());
 		return "addemp";
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/addemp")
 	public String addemp(@ModelAttribute Employee emp,
 	                     @RequestParam("file") MultipartFile file,
@@ -107,6 +111,7 @@ public class EmployeeController {
 		return "editemp";
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/updateemp")
 	public String updateEmployee(@ModelAttribute Employee employee,
 	                             @RequestParam(value = "file", required = false) MultipartFile file,
@@ -156,6 +161,7 @@ public class EmployeeController {
 		return "redirect:/emplist";
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/deleteemp/{id}")
 	public String deleteDepartment(@PathVariable int id) {
 		EmpService.deleteEmp(id);

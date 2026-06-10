@@ -3,6 +3,7 @@ package com.example.empsystem.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,8 @@ public class LeaveRequestController {
 	
 
 	
-	
+
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	@GetMapping("/leave-request")
 	public String showLeaveForm(Model model) {
 		model.addAttribute("leaveRequest", new LeaveRequest());
@@ -66,7 +68,8 @@ public class LeaveRequestController {
 	  
 	  
 	
-	  
+
+		@PreAuthorize("hasRole('ADMIN') or hasRole('USER')") 
 	  @GetMapping("/myleaves")
 	  public String myLeaves(HttpSession session, Model model) {
 
