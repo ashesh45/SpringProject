@@ -1,58 +1,53 @@
 package com.example.empsystem.controller;
 
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.empsystem.enumm.LeaveStatus;
+import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.DepartmentRepository;
 import com.example.empsystem.repository.EmployeeRepository;
 import com.example.empsystem.repository.LeaveRequestRepository;
 
-import jakarta.servlet.http.HttpSession;
-
-@Controller
-@RequestMapping("/employee")
+@RestController
 public class DashboardController {
 
-	@Autowired
-	private EmployeeRepository empRepo;
+    @Autowired
+    private EmployeeRepository empRepo;
 
-	@Autowired
-	private DepartmentRepository deptRepo;
+    @Autowired
+    private DepartmentRepository deptRepo;
 
-	@Autowired
-	private LeaveRequestRepository leaveRepo;
- 
+    @Autowired
+    private LeaveRequestRepository leaveRepo;
 
-	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-	@GetMapping("/dashboard")
-	public String dashboard(Model model, HttpSession session) {
-	if(session.getAttribute("loggedInUser") == null) {
-			
-			return "login";
-		}
-		model.addAttribute("empCount", empRepo.count());
-		model.addAttribute("deptCount", deptRepo.count());
-		model.addAttribute("leaveCount", leaveRepo.count());
-		model.addAttribute("pendingCount", leaveRepo.findByStatus(LeaveStatus.PENDING).size());
-		return "dashboard.html";
-	}
-	
+    @GetMapping("/api/dashboard")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    public ResponseEntity<Map<String, Object>> dashboard() {
 
-	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-	@GetMapping("/profile")	
-	public String getprofile(HttpSession Session) {
-		 if (Session.getAttribute("loggedInUser") == null) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("empCount", empRepo.count());
+        response.put("deptCount", deptRepo.count());
+        response.put("leaveCount", leaveRepo.count());
+        response.put("pendingCount", leaveRepo.findByStatus(LeaveStatus.PENDING).size());
 
-		        return "login";
-		    }
+        return ResponseEntity.ok(response);
+    }
 
-		    return "profile";
-		}
-
-
+    @GetMapping("/api/profile")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    public ResponseEntity<Employee> getProfile(Principal principal) {
+        Employee employee = empRepo.findByUsername(principal.getName());
+        if (employee == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(employee);
+    }
 }

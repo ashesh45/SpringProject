@@ -1,65 +1,45 @@
 package com.example.empsystem.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.empsystem.model.Department;
 import com.example.empsystem.model.Employee;
-import com.example.empsystem.repository.DepartmentRepository;
-import com.example.empsystem.service.DepartmentService;
 import com.example.empsystem.service.EmployeeService;
 
-import jakarta.servlet.http.HttpSession;
-
-@Controller
-@RequestMapping("/admin")
+@RestController
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
 	@Autowired
-	private EmployeeService EmpService;
-
-	@Autowired
-	private DepartmentService deptService;
+	private EmployeeService empService;
 
 	private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
 
-	@GetMapping("/addemp")
-	public String openAddEmpPage(Model model) {
-//		if (session.getAttribute("loggedInUser") == null) {
-//			return "login";
-//		}
-		model.addAttribute("employee", new Employee());
-		model.addAttribute("dlist", deptService.getAllDept());
-		return "addemp";
-	}
-
-	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/addemp")
-	public String addemp(@ModelAttribute Employee emp,
-	                     @RequestParam("file") MultipartFile file,
-	                     Model model,
-	                     HttpSession session) {
-
-		if (session.getAttribute("loggedInUser") == null) {
-			return "login";
-		}
+	@PostMapping
+	public ResponseEntity<?> createEmployee(
+			@RequestPart("employee") Employee emp,
+			@RequestParam("file") MultipartFile file) {
 
 		try {
 			if (!file.isEmpty()) {
@@ -71,59 +51,54 @@ public class EmployeeController {
 				String fileName = sanitizedName + ".jpg";
 
 				Path uploadPath = uploadDir.resolve(fileName);
-				System.out.println("Saving file to: " + uploadPath.toAbsolutePath());
 				Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
 				emp.setPhoto(fileName);
 			}
 
-			EmpService.addEmp(emp);
-			model.addAttribute("msg", "Employee added successfully");
+			empService.addEmp(emp);
+			return ResponseEntity.status(HttpStatus.CREATED).body(emp);
+
 		} catch (IOException e) {
-			e.printStackTrace();
-			model.addAttribute("msg", "File upload failed: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("File upload failed: " + e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("msg", "Error: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error: " + e.getMessage());
 		}
-
-		model.addAttribute("employee", new Employee());
-		model.addAttribute("dlist", deptService.getAllDept());
-		return "addemp";
 	}
 
-	@GetMapping("/emplist")
-	public String getallemp(Model model, HttpSession session) {
-		if (session.getAttribute("loggedInUser") == null) {
-			return "login";
-		}
-		model.addAttribute("emplist", EmpService.getAllEmp());
-		return "emplist";
+	@GetMapping
+	public ResponseEntity<Page<Employee>> getAllEmployees(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Employee> empPage = empService.getAllEmp(pageable);
+		return ResponseEntity.ok(empPage);
 	}
 
-	@GetMapping("/editemp/{id}")
-	public String editEmp(@PathVariable Long id, Model model, HttpSession session) {
-		if (session.getAttribute("loggedInUser") == null) {
-			return "login";
+	@GetMapping("/{id}")
+	public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+		try {
+			Employee emp = empService.getEmpById(id);
+			return ResponseEntity.ok(emp);
+		} catch (RuntimeException e) {
+			return ResponseEntity.notFound().build();
 		}
-		Employee employee = EmpService.getEmpById(id);
-		model.addAttribute("employee", employee);
-		model.addAttribute("dlist", deptService.getAllDept());
-		return "editemp";
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/updateemp")
-	public String updateEmployee(@ModelAttribute Employee employee,
-	                             @RequestParam(value = "file", required = false) MultipartFile file,
-	                             HttpSession session) {
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateEmployee(
+			@PathVariable Long id,
+			@RequestPart("employee") Employee employee,
+			@RequestParam(value = "file", required = false) MultipartFile file) {
 
-		if (session.getAttribute("loggedInUser") == null) {
-			return "login";
-		}
+		try {
+			Employee existing = empService.getEmpById(id);
+			if (existing == null) {
+				return ResponseEntity.notFound().build();
+			}
 
-		Employee existing = EmpService.getEmpById(employee.getId());
-
-		if (existing != null) {
 			existing.setFname(employee.getFname());
 			existing.setLname(employee.getLname());
 			existing.setEmail(employee.getEmail());
@@ -138,34 +113,36 @@ public class EmployeeController {
 			existing.setDepartments(employee.getDepartments());
 
 			if (file != null && !file.isEmpty()) {
-				try {
-					Files.createDirectories(uploadDir);
+				Files.createDirectories(uploadDir);
 
-					String sanitizedName = existing.getFname()
-							.toLowerCase()
-							.replaceAll("[^a-z0-9]", "_");
-					String fileName = sanitizedName + ".jpg";
+				String sanitizedName = existing.getFname()
+						.toLowerCase()
+						.replaceAll("[^a-z0-9]", "_");
+				String fileName = sanitizedName + ".jpg";
 
-					Path uploadPath = uploadDir.resolve(fileName);
-					System.out.println("Saving file to: " + uploadPath.toAbsolutePath());
-					Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-					existing.setPhoto(fileName);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Path uploadPath = uploadDir.resolve(fileName);
+				Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+				existing.setPhoto(fileName);
 			}
 
-			EmpService.updateEmp(existing);
-		}
+			empService.updateEmp(existing);
+			return ResponseEntity.ok(existing);
 
-		return "redirect:/emplist";
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("File upload failed: " + e.getMessage());
+		}
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/deleteemp/{id}")
-	public String deleteDepartment(@PathVariable int id) {
-		EmpService.deleteEmp(id);
-		return "redirect:/emplist";
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
+		try {
+			empService.deleteEmp(id);
+			return ResponseEntity.ok("Employee deleted successfully");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error deleting employee: " + e.getMessage());
+		}
 	}
-
 }

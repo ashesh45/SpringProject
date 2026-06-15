@@ -640,6 +640,54 @@ table tbody tr:nth-child(even):hover {
     display: none;
 }
 
+/* ===== Pagination ===== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.page-link:hover {
+    border-color: #1a237e;
+    color: #1a237e;
+    background: #f0f1ff;
+}
+
+.page-link.active {
+    background: #1a237e;
+    border-color: #1a237e;
+    color: #fff;
+    font-weight: 600;
+}
+
+.page-info {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #888;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .sidebar-toggle {

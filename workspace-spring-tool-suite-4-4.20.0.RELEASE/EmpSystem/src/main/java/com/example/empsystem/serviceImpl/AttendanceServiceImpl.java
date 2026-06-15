@@ -83,6 +83,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	@Override
+	public List<Attendance> getAllAttendanceSorted() {
+		return attendanceRepo.findAllByOrderByDateDesc();
+	}
+
+	@Override
 	public List<Attendance> getAttendanceByEmployee(Long empId) {
 		Employee employee = employeeRepo.findById(empId)
 				.orElseThrow(() -> new RuntimeException("Employee not found"));

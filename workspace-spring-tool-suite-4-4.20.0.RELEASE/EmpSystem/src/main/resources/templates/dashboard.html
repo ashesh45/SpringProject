@@ -18,13 +18,13 @@
     </div>
 
     <div style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; align-items:center;">
-        <form th:action="@{/employee/attendance/checkin}" method="post" style="margin:0;">
+        <form th:action="@{/attendance/checkin}" method="post" style="margin:0;">
             <button type="submit" class="btn btn-success">&#9654; Check In</button>
         </form>
-        <form th:action="@{/employee/attendance/checkout}" method="post" style="margin:0;">
+        <form th:action="@{/attendance/checkout}" method="post" style="margin:0;">
             <button type="submit" class="btn btn-warning">&#9724; Check Out</button>
         </form>
-        <a href="/employee/attendance" class="btn btn-outline">&#128197; View Attendance</a>
+        <a href="/attendance" class="btn btn-outline">&#128197; View Attendance</a>
     </div>
 
     <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>

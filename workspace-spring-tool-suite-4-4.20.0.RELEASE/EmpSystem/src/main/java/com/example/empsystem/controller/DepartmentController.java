@@ -3,97 +3,92 @@ package com.example.empsystem.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.empsystem.model.Department;
 import com.example.empsystem.service.DepartmentService;
 
-import jakarta.servlet.http.HttpSession;
-
-
-@Controller
-@RequestMapping("/admin")
+@RestController
+@RequestMapping("/api/departments")
 public class DepartmentController {
-	
 
     @Autowired
     private DepartmentService departmentService;
-	
-	@GetMapping("/add-department")
-	public String getdepartment(HttpSession session ) {
-	if(session.getAttribute("loggedInUser") == null) {
-			
-			return "login";
-		}
-	    return "addepartment";
-	}
-	
+
+    // Add Department
+    @PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/add-department")
-	public String postdepartment(@ModelAttribute Department department, Model model) {
-   
-	departmentService.addDept(department);
-	
-	model.addAttribute("msg", "Department added success");
-    return "addepartment";
-		 }
-	
-	
-	  @GetMapping("/departmentlist")
-	   public String list(Model model, HttpSession session) {
-			if(session.getAttribute("loggedInUser") == null) {
-				
-				return "redirect:/login";
-			}
-		    						  
-		  model.addAttribute("deptList", departmentService.getAllDept());
-	     return "departmentlist";
-	    }
-	
-	
-	  @PreAuthorize("hasRole('ADMIN')")
-	  @GetMapping("/editdepartment/{id}")
-	    public String editDepartment(@PathVariable int id, Model model) {
+    public ResponseEntity<String> addDepartment(@RequestBody Department department) {
 
-	        Department department = departmentService.getDeptById(id);
+        departmentService.addDept(department);
 
-	        model.addAttribute("department", department);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Department added successfully");
+                
+    }
 
-	        return "editdepartment";
-	    }
-	
+    // Get All Departments
+    
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    public ResponseEntity<List<Department>> getAllDepartments() {
 
-	  @PreAuthorize("hasRole('ADMIN')")
-	    @PostMapping("/updatedepartment")
-	    public String updateDepartment(@ModelAttribute Department department, Model model) {
+        List<Department> departments = departmentService.getAllDept();
 
-	        Department existing = departmentService.getDeptById(department.getId());
+        return ResponseEntity.ok(departments);
+    }
 
-	        if (existing != null) {
-	            existing.setDeptName(department.getDeptName());
-	            existing.setHod(department.getHod());
-	            existing.setPhone(department.getPhone());
+    // Get Department By Id
+    @GetMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Department> getDepartmentById(@PathVariable int id) {
 
-	            departmentService.updateDept(existing);
-	        }
-	        return "redirect:/departmentlist";
-	    }
-	    
-	    
-	  @PreAuthorize("hasRole('ADMIN')")
-	    @GetMapping("/deleteDepartment/{id}")
-	    public String deleteDepartment(@PathVariable int id) {
+        Department department = departmentService.getDeptById(id);
 
-	        departmentService.deleteDept(id);
+        if (department == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-	        return "redirect:/departmentlist";
-	    }
+        return ResponseEntity.ok(department);
+    }
 
+    // Update Department
+    @PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updateDepartment(
+            @PathVariable int id,
+            @RequestBody Department department) {
+
+        Department existing = departmentService.getDeptById(id);
+
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        existing.setDeptName(department.getDeptName());
+        existing.setHod(department.getHod());
+        existing.setPhone(department.getPhone());
+
+        departmentService.updateDept(existing);
+
+        return ResponseEntity.ok("Department updated successfully");
+    }
+
+    // Delete Department
+	@PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDepartment(@PathVariable int id) {
+
+        Department existing = departmentService.getDeptById(id);
+
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        departmentService.deleteDept(id);
+
+        return ResponseEntity.ok("Department deleted successfully");
+    }
 }

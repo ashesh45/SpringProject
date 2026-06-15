@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>All Attendance - EmpSystem</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="fragments :: sidebar"></div>
+<div th:replace="fragments :: sidebar-toggle"></div>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1>All Attendance</h1>
+        <p>View attendance records for all employees</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Attendance Records</h2>
+            <a href="/attendance/export/excel" class="btn btn-success">&#128229; Export to Excel</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(records)}" class="empty-state">
+            <div class="empty-icon">&#128197;</div>
+            <p>No attendance records found.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(records)}" class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${records}">
+                        <td>
+                            <span th:text="${r.employee.fname + ' ' + r.employee.lname}"></span>
+                            <small style="color:#888; display:block;" th:text="'ID: ' + ${r.employee.id}"></small>
+                        </td>
+                        <td th:text="${r.date}"></td>
+                        <td th:text="${r.checkInTime}"></td>
+                        <td>
+                            <span th:if="${r.checkOutTime != null}" th:text="${r.checkOutTime}"></span>
+                            <span th:if="${r.checkOutTime == null}" style="color:#888;">--</span>
+                        </td>
+                        <td>
+                            <span th:text="${r.status}"
+                                  th:classappend="
+                                    ${r.status.name() == 'PRESENT'} ? 'badge badge-approved' :
+                                    (${r.status.name() == 'LATE'} ? 'badge badge-pending' : 'badge badge-rejected')">
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: sidebar-script"></div>
+
+</body>
+</html>

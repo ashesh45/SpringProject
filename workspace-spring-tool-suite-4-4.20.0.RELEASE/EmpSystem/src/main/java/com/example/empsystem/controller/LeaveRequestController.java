@@ -1,87 +1,54 @@
 package com.example.empsystem.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.model.LeaveRequest;
-import com.example.empsystem.model.Payroll;
 import com.example.empsystem.repository.EmployeeRepository;
-import com.example.empsystem.repository.PayrollRepository;
 import com.example.empsystem.service.LeaveService;
 
-import jakarta.servlet.http.HttpSession;
-
-@Controller
-@RequestMapping("/employee")
+@RestController
+@RequestMapping("/api/leaves")
 public class LeaveRequestController {
-	
-	@Autowired
+
+    @Autowired
     private LeaveService leaveService;
-	
-	@Autowired
-	private EmployeeRepository empRepo;
-	
 
-	
+    @Autowired
+    private EmployeeRepository empRepo;
 
-	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-	@GetMapping("/leave-request")
-	public String showLeaveForm(Model model) {
-		model.addAttribute("leaveRequest", new LeaveRequest());
-		return "leaverequest";
-	}
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    @PostMapping
+    public ResponseEntity<?> applyLeave(@RequestBody LeaveRequest request,
+                                        Principal principal) {
 
-	@PostMapping("/leave-request")
-	public String applyLeave(@ModelAttribute LeaveRequest request, HttpSession session, Model model) {
-		Employee loggedInUser = (Employee) session.getAttribute("loggedInUser");
-		if (loggedInUser == null) {
-			return "redirect:/login";
-		}
-		Employee emp = empRepo.findByUsername(loggedInUser.getUsername());
-		if (emp == null) {
-			model.addAttribute("error", "No employee record found for your account");
-			return "leaverequest";
-		}
-		leaveService.applyLeave(emp.getId(), request);
-		model.addAttribute("msg", "Leave applied successfully");
-		return "leaverequest";
-	}
+        Employee emp = empRepo.findByUsername(principal.getName());
+        if (emp == null) {
+            return ResponseEntity.badRequest().body("Employee record not found");
+        }
+        leaveService.applyLeave(emp.getId(), request);
+        return ResponseEntity.ok("Leave applied successfully");
+    }
 
-	
-	  @GetMapping("/all-leaves")
-	    public String getAllLeaves(Model model) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    @GetMapping("/my")
+    public ResponseEntity<List<LeaveRequest>> myLeaves(Principal principal) {
 
-	        model.addAttribute("leaves", leaveService.getAllLeaves());
-
-	        return "leavelist";
-	    }
-	  
-	  
-	
-
-		@PreAuthorize("hasRole('ADMIN') or hasRole('USER')") 
-	  @GetMapping("/myleaves")
-	  public String myLeaves(HttpSession session, Model model) {
-
-	      Employee emp = (Employee) session.getAttribute("loggedInUser");
-
-	      List<LeaveRequest> leaves =
-	              leaveService.findByEmployee(emp.getId());
-
-	      model.addAttribute("leaves", leaves);
-
-	      return "myleaves";
-	  }
-	  
-
+        Employee emp = empRepo.findByUsername(principal.getName());
+        if (emp == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<LeaveRequest> leaves = leaveService.findByEmployee(emp.getId());
+        return ResponseEntity.ok(leaves);
+    }
 }

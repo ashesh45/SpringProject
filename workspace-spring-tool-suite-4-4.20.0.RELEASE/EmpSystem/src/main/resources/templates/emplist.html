@@ -23,7 +23,7 @@
         </div>
 
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search by first name..." onkeyup="searchEmployee()">
+            <input type="text" id="searchInput" placeholder="Search by first or last name..." onkeyup="searchEmployee()">
         </div>
 
         <div th:if="${#lists.isEmpty(emplist)}" class="empty-state">
@@ -31,52 +31,70 @@
             <p>No employees found.</p>
         </div>
 
-        <div th:unless="${#lists.isEmpty(emplist)}" class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Photo</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Gender</th>
-                        <th>Company</th>
-                        <th>Post</th>
-                        <th>Salary</th>
-                        <th>Join Date</th>
-                        <th>DOB</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="e : ${emplist}">
-                        <td th:text="${e.id}"></td>
-                        <td>
-                            <img th:if="${e.photo != null}"
-                                 th:src="@{'/images/' + ${e.photo}}"
-                                 alt="Photo"
-                                 style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;">
-                            <span th:if="${e.photo == null}" style="color:#bbb;">&#128100;</span>
-                        </td>
-                        <td th:text="${e.fname}"></td>
-                        <td th:text="${e.lname}"></td>
-                        <td th:text="${e.email}"></td>
-                        <td th:text="${e.phone}"></td>
-                        <td th:text="${e.gender}"></td>
-                        <td th:text="${e.company}"></td>
-                        <td th:text="${e.post}"></td>
-                        <td th:text="${e.salary}"></td>
-                        <td th:text="${e.joinDate}"></td>
-                        <td th:text="${e.dob}"></td>
-                        <td class="action-cell">
-                            <a th:href="@{/editemp/{id}(id=${e.id})}" class="btn btn-warning btn-sm">Edit</a>
-                            <a th:href="@{/deleteemp/{id}(id=${e.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this employee?')">Delete</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div th:unless="${#lists.isEmpty(emplist)}">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Photo</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                            <th>Company</th>
+                            <th>Post</th>
+                            <th>Salary</th>
+                            <th>Join Date</th>
+                            <th>DOB</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="e : ${emplist}">
+                            <td th:text="${e.id}"></td>
+                            <td>
+                                <img th:if="${e.photo != null}"
+                                     th:src="@{'/images/' + ${e.photo}}"
+                                     alt="Photo"
+                                     style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;">
+                                <span th:if="${e.photo == null}" style="color:#bbb;">&#128100;</span>
+                            </td>
+                            <td th:text="${e.fname}"></td>
+                            <td th:text="${e.lname}"></td>
+                            <td th:text="${e.email}"></td>
+                            <td th:text="${e.phone}"></td>
+                            <td th:text="${e.gender}"></td>
+                            <td th:text="${e.company}"></td>
+                            <td th:text="${e.post}"></td>
+                            <td th:text="${e.salary}"></td>
+                            <td th:text="${e.joinDate}"></td>
+                            <td th:text="${e.dob}"></td>
+                            <td class="action-cell">
+                                <a th:href="@{/editemp/{id}(id=${e.id})}" class="btn btn-warning btn-sm">Edit</a>
+                                <a th:href="@{/deleteemp/{id}(id=${e.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this employee?')">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="page-info" th:if="${totalPages > 0}">
+                Showing page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span>
+                (<span th:text="${totalItems}"></span> total employees)
+            </div>
+
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:href="@{/emplist(page=0)}" class="page-link">&laquo;</a>
+                <a th:href="@{/emplist(page=${currentPage - 1})}" th:if="${currentPage > 0}" class="page-link">&lsaquo;</a>
+                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{/emplist(page=${i})}" th:text="${i + 1}"
+                       th:classappend="${i == currentPage} ? 'active' : ''" class="page-link"></a>
+                </span>
+                <a th:href="@{/emplist(page=${currentPage + 1})}" th:if="${currentPage < totalPages - 1}" class="page-link">&rsaquo;</a>
+                <a th:href="@{/emplist(page=${totalPages - 1})}" class="page-link">&raquo;</a>
+            </div>
         </div>
     </div>
 </div>
@@ -90,21 +108,11 @@ function searchEmployee() {
     var tbody = document.querySelector('table tbody');
     var rows = tbody.querySelectorAll('tr');
 
-    var matches = [];
-    var nonMatches = [];
-
     rows.forEach(function(row) {
         var fname = row.cells[2].textContent.toLowerCase();
-        if (fname.includes(filter)) {
-            matches.push(row);
-        } else {
-            nonMatches.push(row);
-        }
+        var lname = row.cells[3].textContent.toLowerCase();
+        row.style.display = (fname.includes(filter) || lname.includes(filter)) ? '' : 'none';
     });
-
-    tbody.innerHTML = '';
-    matches.forEach(function(row) { tbody.appendChild(row); });
-    nonMatches.forEach(function(row) { tbody.appendChild(row); });
 }
 </script>
 

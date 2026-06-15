@@ -1,137 +1,77 @@
 package com.example.empsystem.controller;
 
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.example.empsystem.model.Employee;
-import com.example.empsystem.repository.EmployeeRepository;
-import com.example.empsystem.service.EmployeeService;
-import com.example.empsystem.utils.MailUtils;
+import com.example.empsystem.dto.JwtRequest;
+import com.example.empsystem.dto.JwtResponse;
+import com.example.empsystem.security.JwtHelper;
 
-import java.util.Random;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import jakarta.servlet.http.HttpSession;
 
-@Controller
-@RequestMapping("/employee")
+@RestController
+@RequestMapping("/auth")
 public class AuthController {
-	
-	
-    @Autowired
-    private EmployeeService empService;	
-	
-	@Autowired
-	private EmployeeRepository empRepo;
-	
-	@Autowired
-	private MailUtils mailUtils;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	
-	@GetMapping("/login")
-	public String getlogin() {
-		
-		return "login";
-		
-	}
-	
-	
-	@PostMapping("/login")
-	public String postlogin(@ModelAttribute Employee e, Model model, HttpSession session) {
 
-	    Employee emp = empRepo.findByUsername(e.getUsername());
+	  @Autowired
+	    private UserDetailsService userDetailsService;
 
-	    if (emp != null && passwordEncoder.matches(e.getPassword(), emp.getPassword())) {
-	        session.setAttribute("loggedInUser", emp);
-	        return "redirect:/dashboard";
+	    @Autowired
+	    private AuthenticationManager manager;
+
+
+	    @Autowired
+	    private JwtHelper helper;
+
+	    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+
+	    @PostMapping("/login")
+	    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
+
+	        this.doAuthenticate(request.getUsername(), request.getPassword());
+
+
+	        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+	        String token = this.helper.generateToken(userDetails);
+
+	        JwtResponse response = JwtResponse.builder()
+	                .jwtToken(token)
+	                .username(userDetails.getUsername()).build();
+	        return new ResponseEntity<>(response, HttpStatus.OK);
 	    }
 
-	    model.addAttribute("msg", "Invalid username or password");
-	    return "login";
-	}
-	
-	@GetMapping("/forgot-password")
-	public String getforgotpage() {
-	    return "forgot-password";
-	}
-	
-	@PostMapping("/send-otp")
-	public String forgotPassword(@RequestParam("email") String email, HttpSession session) {
-   
-	    System.out.println("EMAIL " +email);
-	    
-	    Random random = new Random();
-	    int otp = random.nextInt(900000) + 100000;
-		System.out.println("OTP "+otp);
-		
-	    // Store OTP in session (important for verification step)
-	    session.setAttribute("otp", otp);
-	    session.setAttribute("email", email);
+	    private void doAuthenticate(String email, String password) {
 
-	    // Send OTP via email
-	    String subject = "Your OTP for Password Reset";
-	    String message = "Your OTP is: " + otp + "\nThis OTP is valid for a short time.";
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
+	        try {
+	            manager.authenticate(authentication);
 
-	    mailUtils.sendEmail(email, subject, message);
-	    return "verify-otp";
-	}
 
-	@PostMapping("/verify-otp")
-	public String verifyOtp(@RequestParam("otp") int otp, HttpSession session, Model model) {
+	        } catch (BadCredentialsException e) {
+	            throw new BadCredentialsException(" Invalid Username or Password  !!");
+	        }
 
-	    Integer sessionOtp = (Integer) session.getAttribute("otp");
-	    String email = (String) session.getAttribute("email");
-
-	    if (sessionOtp == null || email == null) {
-	        model.addAttribute("msg", "Session expired. Please try again.");
-	        return "forgot-password";
 	    }
 
-	    if (sessionOtp.equals(otp)) {
-	        return "password-change";
-	    } else {
-	        model.addAttribute("msg", "Invalid OTP. Please try again.");
-	        return "verify-otp";
-	    }
-	}
-
-	@PostMapping("/password-change")
-	public String changePassword(@RequestParam("newPassword") String newPassword,
-	                             @RequestParam("confirmPassword") String confirmPassword,
-	                             HttpSession session, Model model) {
-
-	    String email = (String) session.getAttribute("email");
-
-	    if (email == null) {
-	        model.addAttribute("msg", "Session expired. Please try again.");
-	        return "forgot-password";
+	    @ExceptionHandler(BadCredentialsException.class)
+	    public String exceptionHandler() {
+	        return "Credentials Invalid !!";
 	    }
 
-	    if (!newPassword.equals(confirmPassword)) {
-	        model.addAttribute("msg", "Passwords do not match.");
-	        return "password-change";
-	    }
 
-	    Employee emp = empRepo.findByEmail(email);
-	    if (emp != null) {
-	        emp.setPassword(passwordEncoder.encode(newPassword));
-	        empRepo.save(emp);
-	    }
-
-	    session.invalidate();
-	    return "redirect:/login";
-	}
-	
 }

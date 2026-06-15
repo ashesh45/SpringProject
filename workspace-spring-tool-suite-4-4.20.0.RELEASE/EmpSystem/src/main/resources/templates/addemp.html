@@ -24,7 +24,7 @@
         <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
         <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-        <form th:action="@{/admin/addemp}" th:object="${employee}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/addemp}" th:object="${employee}" method="post" enctype="multipart/form-data">
             <h3 class="form-section-title">Personal Information</h3>
             <div class="form-row">
                 <div class="form-group">

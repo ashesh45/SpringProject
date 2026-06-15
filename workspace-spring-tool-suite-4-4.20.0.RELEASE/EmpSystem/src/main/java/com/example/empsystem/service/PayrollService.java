@@ -16,5 +16,6 @@ public interface PayrollService {
     List<Payroll> getByEmployeeId(Long employeeId);
 
     void deleteById(Long id);
+
 	
 }
