@@ -9,28 +9,27 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.empsystem.dto.PayrollDto;
 import com.example.empsystem.model.Employee;
-import com.example.empsystem.model.Payroll;
 import com.example.empsystem.repository.EmployeeRepository;
-import com.example.empsystem.repository.PayrollRepository;
+import com.example.empsystem.service.PayrollService;
 
 @RestController
 public class MyPayrollController {
 
     @Autowired
-    private PayrollRepository payrollRepo;
+    private PayrollService payrollService;
 
     @Autowired
     private EmployeeRepository empRepo;
 
     @GetMapping("/api/payroll/my")
     @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<List<Payroll>> myPayroll(Principal principal) {
+    public ResponseEntity<List<PayrollDto>> myPayroll(Principal principal) {
         Employee emp = empRepo.findByUsername(principal.getName());
         if (emp == null) {
             return ResponseEntity.notFound().build();
         }
-        List<Payroll> payrolls = payrollRepo.findByEmployeeId(emp.getId());
-        return ResponseEntity.ok(payrolls);
+        return ResponseEntity.ok(payrollService.getPayrollsByEmployeeId(emp.getId()));
     }
 }

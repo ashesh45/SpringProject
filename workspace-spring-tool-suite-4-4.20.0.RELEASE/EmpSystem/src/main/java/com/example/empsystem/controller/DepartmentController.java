@@ -6,9 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.example.empsystem.model.Department;
+import com.example.empsystem.dto.DepartmentDto;
 import com.example.empsystem.service.DepartmentService;
 
 @RestController
@@ -18,77 +25,50 @@ public class DepartmentController {
     @Autowired
     private DepartmentService departmentService;
 
-    // Add Department
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> addDepartment(@RequestBody Department department) {
-
-        departmentService.addDept(department);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("Department added successfully");
-                
+    public ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto dto) {
+        DepartmentDto created = departmentService.createDepartment(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // Get All Departments
-    
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<List<Department>> getAllDepartments() {
-
-        List<Department> departments = departmentService.getAllDept();
-
-        return ResponseEntity.ok(departments);
+    @GetMapping
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        return ResponseEntity.ok(departmentService.getAllDepartments());
     }
 
-    // Get Department By Id
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Department> getDepartmentById(@PathVariable int id) {
-
-        Department department = departmentService.getDeptById(id);
-
-        if (department == null) {
+    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(departmentService.getDepartmentById(id));
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(department);
     }
 
-    // Update Department
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateDepartment(
+    public ResponseEntity<DepartmentDto> updateDepartment(
             @PathVariable int id,
-            @RequestBody Department department) {
-
-        Department existing = departmentService.getDeptById(id);
-
-        if (existing == null) {
+            @RequestBody DepartmentDto dto) {
+        try {
+            DepartmentDto updated = departmentService.updateDepartment(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-
-        existing.setDeptName(department.getDeptName());
-        existing.setHod(department.getHod());
-        existing.setPhone(department.getPhone());
-
-        departmentService.updateDept(existing);
-
-        return ResponseEntity.ok("Department updated successfully");
     }
 
-    // Delete Department
-	@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDepartment(@PathVariable int id) {
-
-        Department existing = departmentService.getDeptById(id);
-
-        if (existing == null) {
+        try {
+            departmentService.deleteDepartment(id);
+            return ResponseEntity.ok("Department deleted successfully");
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-
-        departmentService.deleteDept(id);
-
-        return ResponseEntity.ok("Department deleted successfully");
     }
 }

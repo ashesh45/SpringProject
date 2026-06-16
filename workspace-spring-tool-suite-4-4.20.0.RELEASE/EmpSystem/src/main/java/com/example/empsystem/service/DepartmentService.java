@@ -1,19 +1,18 @@
 package com.example.empsystem.service;
 
 import java.util.List;
-import com.example.empsystem.model.Department;
+
+import com.example.empsystem.dto.DepartmentDto;
 
 public interface DepartmentService {
 
-    void addDept(Department dept);
+    DepartmentDto createDepartment(DepartmentDto dto);
 
-    void deleteDept(int id);
+    DepartmentDto getDepartmentById(int id);
 
-    void updateDept(Department dept);
+    List<DepartmentDto> getAllDepartments();
 
-    Department getDeptById(int id);
+    DepartmentDto updateDepartment(int id, DepartmentDto dto);
 
-    List<Department> getAllDept();
-
-    List<Department> searchDept(String name);
+    void deleteDepartment(int id);
 }

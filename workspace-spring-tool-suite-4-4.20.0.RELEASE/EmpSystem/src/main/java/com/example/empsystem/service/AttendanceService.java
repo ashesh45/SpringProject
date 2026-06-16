@@ -2,20 +2,17 @@ package com.example.empsystem.service;
 
 import java.util.List;
 
-import com.example.empsystem.model.Attendance;
+import com.example.empsystem.dto.AttendanceDto;
 
 public interface AttendanceService {
 
-    String checkIn(Long id);
+    String checkIn(Long empId);
 
-    String checkOut(Long id);
+    String checkOut(Long empId);
 
-    List<Attendance> getAllAttendance();
+    List<AttendanceDto> getMyAttendance(Long empId);
 
-    List<Attendance> getAllAttendanceSorted();
+    AttendanceDto getTodayAttendance(Long empId);
 
-    List<Attendance> getAttendanceByEmployee(Long id);
-
-    Attendance getTodayAttendance(Long id);
-
+    List<AttendanceDto> getAllAttendanceSorted();
 }

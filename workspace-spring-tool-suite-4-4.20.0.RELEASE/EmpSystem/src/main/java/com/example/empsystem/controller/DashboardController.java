@@ -6,10 +6,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.empsystem.dto.EmployeeDTO;
+import com.example.empsystem.dto.mapper.EmployeeMapper;
 import com.example.empsystem.enumm.LeaveStatus;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.DepartmentRepository;
@@ -29,7 +30,6 @@ public class DashboardController {
     private LeaveRequestRepository leaveRepo;
 
     @GetMapping("/api/dashboard")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ResponseEntity<Map<String, Object>> dashboard() {
 
         Map<String, Object> response = new HashMap<>();
@@ -42,12 +42,11 @@ public class DashboardController {
     }
 
     @GetMapping("/api/profile")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<Employee> getProfile(Principal principal) {
+    public ResponseEntity<EmployeeDTO> getProfile(Principal principal) {
         Employee employee = empRepo.findByUsername(principal.getName());
         if (employee == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(employee);
+        return ResponseEntity.ok(EmployeeMapper.toDto(employee));
     }
 }

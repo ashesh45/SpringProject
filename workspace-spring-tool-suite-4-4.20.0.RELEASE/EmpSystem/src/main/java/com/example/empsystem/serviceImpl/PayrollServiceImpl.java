@@ -1,58 +1,60 @@
 package com.example.empsystem.serviceImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.empsystem.dto.PayrollDto;
+import com.example.empsystem.dto.mapper.PayrollMapper;
+import com.example.empsystem.dto.request.CreatePayrollRequest;
+import com.example.empsystem.model.Employee;
 import com.example.empsystem.model.Payroll;
+import com.example.empsystem.repository.EmployeeRepository;
 import com.example.empsystem.repository.PayrollRepository;
 import com.example.empsystem.service.PayrollService;
 
 @Service
+@Transactional
 public class PayrollServiceImpl implements PayrollService {
 
-	@Autowired
-	private PayrollRepository payrollRepository;
-	
-	@Override
-	public Payroll calculateAndSave(Payroll payroll) {
-		// TODO Auto-generated method stub
-        double overtimePay =
-                payroll.getOvertimeHours() * payroll.getOvertimeRate();
+    @Autowired
+    private PayrollRepository payrollRepo;
 
-        double grossSalary =
-                payroll.getBasicSalary() + overtimePay + payroll.getBonus();
+    @Autowired
+    private EmployeeRepository employeeRepo;
 
-        double netSalary = grossSalary - payroll.getDeduction();
+    @Override
+    public PayrollDto createPayroll(CreatePayrollRequest request) {
+        Employee employee = employeeRepo.findById(request.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + request.getEmployeeId()));
 
-        payroll.setNetSalary(netSalary);
+        Payroll entity = PayrollMapper.toEntity(request);
+        entity.setEmployee(employee);
 
-        return payrollRepository.save(payroll);
-	}
+        // Calculate net salary
+        double overtimePay = entity.getOvertimeHours() * entity.getOvertimeRate();
+        double grossSalary = entity.getBasicSalary() + overtimePay + entity.getBonus();
+        double netSalary = grossSalary - entity.getDeduction();
+        entity.setNetSalary(netSalary);
 
-	@Override
-	public List<Payroll> getAll() {
-		// TODO Auto-generated method stub
-		return payrollRepository.findAll();
-	}
+        entity = payrollRepo.save(entity);
+        return PayrollMapper.toDto(entity);
+    }
 
-	@Override
-	public Payroll getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<PayrollDto> getAllPayrolls() {
+        return payrollRepo.findAll().stream()
+                .map(PayrollMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public List<Payroll> getByEmployeeId(Long employeeId) {
-		// TODO Auto-generated method stub
-		return payrollRepository.findByEmployeeId(employeeId);
-	}
-
-	@Override
-	public void deleteById(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
+    @Override
+    public List<PayrollDto> getPayrollsByEmployeeId(Long employeeId) {
+        return payrollRepo.findByEmployeeId(employeeId).stream()
+                .map(PayrollMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

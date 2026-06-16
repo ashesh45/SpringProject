@@ -2,20 +2,14 @@ package com.example.empsystem.service;
 
 import java.util.List;
 
-import com.example.empsystem.model.Payroll;
+import com.example.empsystem.dto.PayrollDto;
+import com.example.empsystem.dto.request.CreatePayrollRequest;
 
 public interface PayrollService {
 
+    PayrollDto createPayroll(CreatePayrollRequest request);
 
-    Payroll calculateAndSave(Payroll payroll);
+    List<PayrollDto> getAllPayrolls();
 
-    List<Payroll> getAll();
-
-    Payroll getById(Long id);
-
-    List<Payroll> getByEmployeeId(Long employeeId);
-
-    void deleteById(Long id);
-
-	
+    List<PayrollDto> getPayrollsByEmployeeId(Long employeeId);
 }

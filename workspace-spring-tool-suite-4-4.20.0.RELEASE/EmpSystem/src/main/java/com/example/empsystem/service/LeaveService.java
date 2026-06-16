@@ -2,30 +2,17 @@ package com.example.empsystem.service;
 
 import java.util.List;
 
-import com.example.empsystem.enumm.LeaveStatus;
-import com.example.empsystem.model.LeaveRequest;
+import com.example.empsystem.dto.LeaveRequestDto;
 
 public interface LeaveService {
-	
 
-	LeaveRequest applyLeave(Long empId, LeaveRequest request);
+    LeaveRequestDto applyLeave(Long empId, LeaveRequestDto dto);
 
-    List<LeaveRequest> getAllLeaves();
+    List<LeaveRequestDto> getLeavesByEmployee(Long empId);
 
-    LeaveRequest getLeaveById(Long id);
+    List<LeaveRequestDto> getAllLeaves();
 
-    void deleteLeave(Long id);
+    LeaveRequestDto approveLeave(Long id);
 
-    LeaveRequest updateLeaveStatus(Long id, LeaveStatus status);
-
-    List<LeaveRequest> getPendingLeaves();
-    
-    LeaveRequest approveLeave(Long id);
-
-    LeaveRequest rejectLeave(Long id);
-
-	List<LeaveRequest> findByEmployee(Long id);
-
-
-
+    LeaveRequestDto rejectLeave(Long id);
 }

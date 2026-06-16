@@ -1,61 +1,60 @@
 package com.example.empsystem.serviceImpl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.empsystem.dto.EmployeeDTO;
+import com.example.empsystem.dto.mapper.EmployeeMapper;
+import com.example.empsystem.dto.request.CreateEmployeeRequest;
 import com.example.empsystem.model.Employee;
+import com.example.empsystem.repository.DepartmentRepository;
 import com.example.empsystem.repository.EmployeeRepository;
 import com.example.empsystem.service.EmployeeService;
 
 @Service
+@Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
-	@Autowired
-	private EmployeeRepository EmpRepo;
+    @Autowired
+    private EmployeeRepository empRepo;
 
-	@Override
-	public void addEmp(Employee emp) {
-		EmpRepo.save(emp);
-	}
+    @Autowired
+    private DepartmentRepository deptRepo;
 
-	@Override
-	public void deleteEmp(int id) {
-		EmpRepo.deleteById((long) id);
-	}
+    @Override
+    public EmployeeDTO createEmployee(CreateEmployeeRequest request) {
+        Employee entity = EmployeeMapper.toEntity(request, deptRepo);
+        entity = empRepo.save(entity);
+        return EmployeeMapper.toDto(entity);
+    }
 
-	@Override
-	public void updateEmp(Employee emp) {
-		EmpRepo.save(emp);
-	}
+    @Override
+    public EmployeeDTO getEmployeeById(Long id) {
+        Employee entity = empRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+        return EmployeeMapper.toDto(entity);
+    }
 
-	@Override
-	public Employee getEmpById(Long id) {
-		return EmpRepo.findById((long) id)
-				.orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
-	}
+    @Override
+    public Page<EmployeeDTO> getAllEmployees(Pageable pageable) {
+        return empRepo.findAll(pageable)
+                .map(EmployeeMapper::toDto);
+    }
 
-	@Override
-	public List<Employee> getAllEmp() {
-		return EmpRepo.findAll();
-	}
+    @Override
+    public EmployeeDTO updateEmployee(Long id, EmployeeDTO dto) {
+        Employee entity = empRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+        EmployeeMapper.updateEntity(entity, dto, deptRepo);
+        entity = empRepo.save(entity);
+        return EmployeeMapper.toDto(entity);
+    }
 
-	@Override
-	public Page<Employee> getAllEmp(Pageable pageable) {
-		return EmpRepo.findAll(pageable);
-	}
-
-	@Override
-	public List<Employee> searcheEmp(String fname) {
-		return EmpRepo.findByFnameContainingIgnoreCase(fname);
-	}
-
-	@Override
-	public Employee userLogin(String username, String password) {
-		return EmpRepo.findByUsernameAndPassword(username, password);
-	}
+    @Override
+    public void deleteEmployee(int id) {
+        empRepo.deleteById((long) id);
+    }
 }
-

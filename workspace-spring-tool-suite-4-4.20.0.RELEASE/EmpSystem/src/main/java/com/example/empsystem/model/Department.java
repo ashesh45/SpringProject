@@ -17,18 +17,16 @@ import lombok.ToString;
 @ToString(exclude = "employees")
 @Table(name = "dept_tbl")
 public class Department {
-	
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
-	
-	
+	private Integer id;
+
 	private String deptName;
 	private String hod;
 	private String phone;
-	
-    @ManyToMany(mappedBy = "departments", cascade = CascadeType.ALL)
-    private List<Employee> employees;
+
+	@ManyToMany(mappedBy = "departments")
+	private List<Employee> employees;
 
 }

@@ -1,55 +1,58 @@
 package com.example.empsystem.serviceImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.empsystem.dto.DepartmentDto;
+import com.example.empsystem.dto.mapper.DepartmentMapper;
 import com.example.empsystem.model.Department;
 import com.example.empsystem.repository.DepartmentRepository;
 import com.example.empsystem.service.DepartmentService;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
-	
+
 	@Autowired
 	private DepartmentRepository departmentRepo;
 
 	@Override
-	public void addDept(Department dept) {
-		// TODO Auto-generated method stub
-		departmentRepo.save(dept);
+	public DepartmentDto createDepartment(DepartmentDto dto) {
+		Department department = DepartmentMapper.toEntity(dto);
+		Department saved = departmentRepo.save(department);
+		return DepartmentMapper.toDto(saved);
 	}
 
 	@Override
-	public void deleteDept(int id) {
-		// TODO Auto-generated method stub
-		  departmentRepo.deleteById(id);
+	public DepartmentDto getDepartmentById(int id) {
+		Department department = departmentRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("Department not found with id: " + id));
+		return DepartmentMapper.toDto(department);
 	}
 
 	@Override
-	public void updateDept(Department dept) {
-		// TODO Auto-generated method stub
-		departmentRepo.save(dept);
+	public List<DepartmentDto> getAllDepartments() {
+		return departmentRepo.findAll().stream()
+				.map(DepartmentMapper::toDto)
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Department getDeptById(int id) {
-		return departmentRepo.findById(id)
-	            .orElseThrow(() -> new RuntimeException("Department not found with id: " + id));
-	
+	public DepartmentDto updateDepartment(int id, DepartmentDto dto) {
+		Department existing = departmentRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("Department not found with id: " + id));
+		existing.setDeptName(dto.getDeptName());
+		existing.setHod(dto.getHod());
+		existing.setPhone(dto.getPhone());
+		Department saved = departmentRepo.save(existing);
+		return DepartmentMapper.toDto(saved);
 	}
 
 	@Override
-	public List<Department> getAllDept() {
-		// TODO Auto-generated method stub
-		return departmentRepo.findAll();
-	}
-
-	@Override
-	public List<Department> searchDept(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public void deleteDepartment(int id) {
+		departmentRepo.deleteById(id);
 	}
 
 }

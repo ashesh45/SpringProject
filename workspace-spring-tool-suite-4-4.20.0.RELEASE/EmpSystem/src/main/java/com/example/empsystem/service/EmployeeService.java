@@ -1,21 +1,20 @@
 package com.example.empsystem.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.example.empsystem.model.Employee;
+import com.example.empsystem.dto.EmployeeDTO;
+import com.example.empsystem.dto.request.CreateEmployeeRequest;
 
 public interface EmployeeService {
 
-    void addEmp(Employee emp);
-    void deleteEmp(int id);
-    void updateEmp(Employee emp);
-    Employee getEmpById(Long id);
-    List<Employee> getAllEmp();
-    Page<Employee> getAllEmp(Pageable pageable);
-    List<Employee> searcheEmp(String fname);
+    EmployeeDTO createEmployee(CreateEmployeeRequest request);
 
-    Employee userLogin(String username, String password);
+    EmployeeDTO getEmployeeById(Long id);
+
+    Page<EmployeeDTO> getAllEmployees(Pageable pageable);
+
+    EmployeeDTO updateEmployee(Long id, EmployeeDTO dto);
+
+    void deleteEmployee(int id);
 }

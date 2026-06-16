@@ -24,125 +24,105 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.empsystem.model.Employee;
+import com.example.empsystem.dto.EmployeeDTO;
+import com.example.empsystem.dto.request.CreateEmployeeRequest;
 import com.example.empsystem.service.EmployeeService;
 
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-	@Autowired
-	private EmployeeService empService;
+    @Autowired
+    private EmployeeService empService;
 
-	private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
+    private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
 
-	@PostMapping
-	public ResponseEntity<?> createEmployee(
-			@RequestPart("employee") Employee emp,
-			@RequestParam("file") MultipartFile file) {
+    @PostMapping
+    public ResponseEntity<?> createEmployee(
+            @RequestPart("employee") CreateEmployeeRequest request,
+            @RequestParam("file") MultipartFile file) {
 
-		try {
-			if (!file.isEmpty()) {
-				Files.createDirectories(uploadDir);
+        try {
+            if (!file.isEmpty()) {
+                Files.createDirectories(uploadDir);
 
-				String sanitizedName = emp.getFname()
-						.toLowerCase()
-						.replaceAll("[^a-z0-9]", "_");
-				String fileName = sanitizedName + ".jpg";
+                String sanitizedName = request.getFname()
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9]", "_");
+                String fileName = sanitizedName + ".jpg";
 
-				Path uploadPath = uploadDir.resolve(fileName);
-				Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-				emp.setPhoto(fileName);
-			}
+                Path uploadPath = uploadDir.resolve(fileName);
+                Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                request.setPhoto(fileName);
+            }
 
-			empService.addEmp(emp);
-			return ResponseEntity.status(HttpStatus.CREATED).body(emp);
+            EmployeeDTO result = empService.createEmployee(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
 
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("File upload failed: " + e.getMessage());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Error: " + e.getMessage());
-		}
-	}
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("File upload failed: " + e.getMessage());
+        }
+    }
 
-	@GetMapping
-	public ResponseEntity<Page<Employee>> getAllEmployees(
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size) {
+    @GetMapping
+    public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-		Pageable pageable = PageRequest.of(page, size);
-		Page<Employee> empPage = empService.getAllEmp(pageable);
-		return ResponseEntity.ok(empPage);
-	}
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(empService.getAllEmployees(pageable));
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-		try {
-			Employee emp = empService.getEmpById(id);
-			return ResponseEntity.ok(emp);
-		} catch (RuntimeException e) {
-			return ResponseEntity.notFound().build();
-		}
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(empService.getEmployeeById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateEmployee(
-			@PathVariable Long id,
-			@RequestPart("employee") Employee employee,
-			@RequestParam(value = "file", required = false) MultipartFile file) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEmployee(
+            @PathVariable Long id,
+            @RequestPart("employee") EmployeeDTO dto,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
 
-		try {
-			Employee existing = empService.getEmpById(id);
-			if (existing == null) {
-				return ResponseEntity.notFound().build();
-			}
+        try {
+            if (file != null && !file.isEmpty()) {
+                Files.createDirectories(uploadDir);
 
-			existing.setFname(employee.getFname());
-			existing.setLname(employee.getLname());
-			existing.setEmail(employee.getEmail());
-			existing.setPhone(employee.getPhone());
-			existing.setGender(employee.getGender());
-			existing.setDob(employee.getDob());
-			existing.setCompany(employee.getCompany());
-			existing.setPost(employee.getPost());
-			existing.setSalary(employee.getSalary());
-			existing.setJoinDate(employee.getJoinDate());
-			existing.setAddress(employee.getAddress());
-			existing.setDepartments(employee.getDepartments());
+                String sanitizedName = dto.getFname()
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9]", "_");
+                String fileName = sanitizedName + ".jpg";
 
-			if (file != null && !file.isEmpty()) {
-				Files.createDirectories(uploadDir);
+                Path uploadPath = uploadDir.resolve(fileName);
+                Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                dto.setPhoto(fileName);
+            }
 
-				String sanitizedName = existing.getFname()
-						.toLowerCase()
-						.replaceAll("[^a-z0-9]", "_");
-				String fileName = sanitizedName + ".jpg";
+            EmployeeDTO result = empService.updateEmployee(id, dto);
+            return ResponseEntity.ok(result);
 
-				Path uploadPath = uploadDir.resolve(fileName);
-				Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-				existing.setPhoto(fileName);
-			}
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("File upload failed: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-			empService.updateEmp(existing);
-			return ResponseEntity.ok(existing);
-
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("File upload failed: " + e.getMessage());
-		}
-	}
-
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
-		try {
-			empService.deleteEmp(id);
-			return ResponseEntity.ok("Employee deleted successfully");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Error deleting employee: " + e.getMessage());
-		}
-	}
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
+        try {
+            empService.deleteEmployee(id);
+            return ResponseEntity.ok("Employee deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting employee: " + e.getMessage());
+        }
+    }
 }

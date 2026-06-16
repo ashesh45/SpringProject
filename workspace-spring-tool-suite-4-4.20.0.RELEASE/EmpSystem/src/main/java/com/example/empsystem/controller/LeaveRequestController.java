@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.empsystem.dto.LeaveRequestDto;
 import com.example.empsystem.model.Employee;
-import com.example.empsystem.model.LeaveRequest;
 import com.example.empsystem.repository.EmployeeRepository;
 import com.example.empsystem.service.LeaveService;
 
@@ -29,26 +29,25 @@ public class LeaveRequestController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     @PostMapping
-    public ResponseEntity<?> applyLeave(@RequestBody LeaveRequest request,
+    public ResponseEntity<?> applyLeave(@RequestBody LeaveRequestDto dto,
                                         Principal principal) {
 
         Employee emp = empRepo.findByUsername(principal.getName());
         if (emp == null) {
             return ResponseEntity.badRequest().body("Employee record not found");
         }
-        leaveService.applyLeave(emp.getId(), request);
-        return ResponseEntity.ok("Leave applied successfully");
+        LeaveRequestDto result = leaveService.applyLeave(emp.getId(), dto);
+        return ResponseEntity.ok(result);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     @GetMapping("/my")
-    public ResponseEntity<List<LeaveRequest>> myLeaves(Principal principal) {
+    public ResponseEntity<List<LeaveRequestDto>> myLeaves(Principal principal) {
 
         Employee emp = empRepo.findByUsername(principal.getName());
         if (emp == null) {
             return ResponseEntity.notFound().build();
         }
-        List<LeaveRequest> leaves = leaveService.findByEmployee(emp.getId());
-        return ResponseEntity.ok(leaves);
+        return ResponseEntity.ok(leaveService.getLeavesByEmployee(emp.getId()));
     }
 }
