@@ -1,18 +1,26 @@
 package com.example.empsystem.serviceImpl;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.empsystem.dto.AttendanceDto;
-import com.example.empsystem.dto.mapper.AttendanceMapper;
 import com.example.empsystem.enumm.AttendanceStatus;
+
+import jakarta.servlet.http.HttpServletResponse;
 import com.example.empsystem.model.Attendance;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.AttendanceRepository;
@@ -30,6 +38,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private EmployeeRepository employeeRepo;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public String checkIn(Long empId) {
@@ -87,7 +98,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         Employee employee = employeeRepo.findById(empId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         return attendanceRepo.findByEmployee(employee).stream()
-                .map(AttendanceMapper::toDto)
+                .map(entity -> modelMapper.map(entity, AttendanceDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -97,13 +108,51 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         Attendance attendance = attendanceRepo.findByEmployeeAndDate(employee, LocalDate.now())
                 .orElse(null);
-        return AttendanceMapper.toDto(attendance);
+        return modelMapper.map(attendance, AttendanceDto.class);
     }
 
     @Override
     public List<AttendanceDto> getAllAttendanceSorted() {
         return attendanceRepo.findAllByOrderByDateDesc().stream()
-                .map(AttendanceMapper::toDto)
+                .map(entity -> modelMapper.map(entity, AttendanceDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void exportExcel(HttpServletResponse response) {
+        List<AttendanceDto> records = getAllAttendanceSorted();
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Attendance");
+
+            Row header = sheet.createRow(0);
+            String[] cols = {"Employee ID", "First Name", "Last Name", "Date", "Check In", "Check Out", "Status"};
+            for (int i = 0; i < cols.length; i++) {
+                header.createCell(i).setCellValue(cols[i]);
+            }
+
+            int rowIdx = 1;
+            for (AttendanceDto a : records) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(a.getEmployeeId() != null ? a.getEmployeeId() : 0);
+                row.createCell(1).setCellValue(a.getEmployeeName() != null ? a.getEmployeeName().split(" ")[0] : "");
+                row.createCell(2).setCellValue(a.getEmployeeName() != null && a.getEmployeeName().contains(" ")
+                        ? a.getEmployeeName().substring(a.getEmployeeName().indexOf(' ') + 1) : "");
+                row.createCell(3).setCellValue(a.getDate() != null ? a.getDate().toString() : "");
+                row.createCell(4).setCellValue(a.getCheckInTime() != null ? a.getCheckInTime().toString() : "");
+                row.createCell(5).setCellValue(a.getCheckOutTime() != null ? a.getCheckOutTime().toString() : "");
+                row.createCell(6).setCellValue(a.getStatus() != null ? a.getStatus() : "");
+            }
+
+            for (int i = 0; i < cols.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=attendance.xlsx");
+            workbook.write(response.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException("Excel export failed: " + e.getMessage());
+        }
     }
 }

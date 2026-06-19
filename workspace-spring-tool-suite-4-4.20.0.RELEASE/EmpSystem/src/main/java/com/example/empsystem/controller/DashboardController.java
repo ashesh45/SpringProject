@@ -4,13 +4,13 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.empsystem.dto.EmployeeDTO;
-import com.example.empsystem.dto.mapper.EmployeeMapper;
 import com.example.empsystem.enumm.LeaveStatus;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.DepartmentRepository;
@@ -28,6 +28,9 @@ public class DashboardController {
 
     @Autowired
     private LeaveRequestRepository leaveRepo;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/api/dashboard")
     public ResponseEntity<Map<String, Object>> dashboard() {
@@ -47,6 +50,6 @@ public class DashboardController {
         if (employee == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(EmployeeMapper.toDto(employee));
+        return ResponseEntity.ok(modelMapper.map(employee, EmployeeDTO.class));
     }
 }

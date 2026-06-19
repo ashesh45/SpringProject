@@ -3,13 +3,14 @@ package com.example.empsystem.serviceImpl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.empsystem.dto.LeaveRequestDto;
-import com.example.empsystem.dto.mapper.LeaveRequestMapper;
 import com.example.empsystem.enumm.LeaveStatus;
+import com.example.empsystem.enumm.LeaveType;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.model.LeaveRequest;
 import com.example.empsystem.repository.EmployeeRepository;
@@ -26,28 +27,41 @@ public class LeaveServiceImpl implements LeaveService {
     @Autowired
     private EmployeeRepository empRepo;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
     public LeaveRequestDto applyLeave(Long empId, LeaveRequestDto dto) {
         Employee emp = empRepo.findById(empId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        LeaveRequest entity = LeaveRequestMapper.toEntity(empId, dto);
+        LeaveRequest entity = new LeaveRequest();
+        entity.setStartDate(dto.getStartDate());
+        entity.setEndDate(dto.getEndDate());
+        entity.setReason(dto.getReason());
+        entity.setAppliedDate(java.time.LocalDate.now());
+        entity.setStatus(LeaveStatus.PENDING);
+
+        if (dto.getLeaveType() != null) {
+            entity.setLeaveType(LeaveType.valueOf(dto.getLeaveType()));
+        }
+
         entity.setEmployee(emp);
         entity = leaveRepo.save(entity);
-        return LeaveRequestMapper.toDto(entity);
+        return modelMapper.map(entity, LeaveRequestDto.class);
     }
 
     @Override
     public List<LeaveRequestDto> getLeavesByEmployee(Long empId) {
         return leaveRepo.findByEmployeeId(empId).stream()
-                .map(LeaveRequestMapper::toDto)
+                .map(entity -> modelMapper.map(entity, LeaveRequestDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<LeaveRequestDto> getAllLeaves() {
         return leaveRepo.findAll().stream()
-                .map(LeaveRequestMapper::toDto)
+                .map(entity -> modelMapper.map(entity, LeaveRequestDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -57,7 +71,7 @@ public class LeaveServiceImpl implements LeaveService {
                 .orElseThrow(() -> new RuntimeException("Leave not found with id: " + id));
         entity.setStatus(LeaveStatus.APPROVED);
         entity = leaveRepo.save(entity);
-        return LeaveRequestMapper.toDto(entity);
+        return modelMapper.map(entity, LeaveRequestDto.class);
     }
 
     @Override
@@ -66,6 +80,6 @@ public class LeaveServiceImpl implements LeaveService {
                 .orElseThrow(() -> new RuntimeException("Leave not found with id: " + id));
         entity.setStatus(LeaveStatus.REJECTED);
         entity = leaveRepo.save(entity);
-        return LeaveRequestMapper.toDto(entity);
+        return modelMapper.map(entity, LeaveRequestDto.class);
     }
 }

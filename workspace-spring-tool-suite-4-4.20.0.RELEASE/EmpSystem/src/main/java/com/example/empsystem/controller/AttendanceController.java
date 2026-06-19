@@ -1,15 +1,10 @@
 package com.example.empsystem.controller;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,38 +82,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/export/excel")
-    public void exportExcel(HttpServletResponse response) throws IOException {
-        List<AttendanceDto> records = attendanceService.getAllAttendanceSorted();
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Attendance");
-
-        Row header = sheet.createRow(0);
-        String[] cols = {"Employee ID", "First Name", "Last Name", "Date", "Check In", "Check Out", "Status"};
-        for (int i = 0; i < cols.length; i++) {
-            header.createCell(i).setCellValue(cols[i]);
-        }
-
-        int rowIdx = 1;
-        for (AttendanceDto a : records) {
-            Row row = sheet.createRow(rowIdx++);
-            row.createCell(0).setCellValue(a.getEmployeeId() != null ? a.getEmployeeId() : 0);
-            row.createCell(1).setCellValue(a.getEmployeeName() != null ? a.getEmployeeName().split(" ")[0] : "");
-            row.createCell(2).setCellValue(a.getEmployeeName() != null && a.getEmployeeName().contains(" ")
-                    ? a.getEmployeeName().substring(a.getEmployeeName().indexOf(' ') + 1) : "");
-            row.createCell(3).setCellValue(a.getDate() != null ? a.getDate().toString() : "");
-            row.createCell(4).setCellValue(a.getCheckInTime() != null ? a.getCheckInTime().toString() : "");
-            row.createCell(5).setCellValue(a.getCheckOutTime() != null ? a.getCheckOutTime().toString() : "");
-            row.createCell(6).setCellValue(a.getStatus() != null ? a.getStatus() : "");
-        }
-
-        for (int i = 0; i < cols.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=attendance.xlsx");
-        workbook.write(response.getOutputStream());
-        workbook.close();
+    public void exportExcel(HttpServletResponse response) {
+        attendanceService.exportExcel(response);
     }
 }

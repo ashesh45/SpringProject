@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.example.empsystem.dto.AttendanceDto;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public interface AttendanceService {
 
     String checkIn(Long empId);
@@ -15,4 +17,6 @@ public interface AttendanceService {
     AttendanceDto getTodayAttendance(Long empId);
 
     List<AttendanceDto> getAllAttendanceSorted();
+
+    void exportExcel(HttpServletResponse response);
 }

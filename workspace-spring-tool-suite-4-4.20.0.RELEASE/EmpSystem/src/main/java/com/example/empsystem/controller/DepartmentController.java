@@ -41,11 +41,7 @@ public class DepartmentController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable int id) {
-        try {
-            return ResponseEntity.ok(departmentService.getDepartmentById(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(departmentService.getDepartmentById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -53,22 +49,13 @@ public class DepartmentController {
     public ResponseEntity<DepartmentDto> updateDepartment(
             @PathVariable int id,
             @RequestBody DepartmentDto dto) {
-        try {
-            DepartmentDto updated = departmentService.updateDepartment(id, dto);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(departmentService.updateDepartment(id, dto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDepartment(@PathVariable int id) {
-        try {
-            departmentService.deleteDepartment(id);
-            return ResponseEntity.ok("Department deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        departmentService.deleteDepartment(id);
+        return ResponseEntity.ok("Department deleted successfully");
     }
 }

@@ -38,12 +38,8 @@ public class AdminPayrollController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createPayroll(@RequestBody CreatePayrollRequest request) {
-        try {
-            PayrollDto saved = payrollService.createPayroll(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        PayrollDto saved = payrollService.createPayroll(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

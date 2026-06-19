@@ -2,19 +2,20 @@ package com.example.empsystem.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.empsystem.dto.EmployeeDTO;
 import com.example.empsystem.dto.request.CreateEmployeeRequest;
 
 public interface EmployeeService {
 
-    EmployeeDTO createEmployee(CreateEmployeeRequest request);
+    EmployeeDTO createEmployee(CreateEmployeeRequest request, MultipartFile file);
 
     EmployeeDTO getEmployeeById(Long id);
 
     Page<EmployeeDTO> getAllEmployees(Pageable pageable);
 
-    EmployeeDTO updateEmployee(Long id, EmployeeDTO dto);
+    EmployeeDTO updateEmployee(Long id, EmployeeDTO dto, MultipartFile file);
 
     void deleteEmployee(int id);
 }

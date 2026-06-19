@@ -1,11 +1,5 @@
 package com.example.empsystem.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,34 +29,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeService empService;
 
-    private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
-
     @PostMapping
     public ResponseEntity<?> createEmployee(
             @RequestPart("employee") CreateEmployeeRequest request,
             @RequestParam("file") MultipartFile file) {
 
-        try {
-            if (!file.isEmpty()) {
-                Files.createDirectories(uploadDir);
-
-                String sanitizedName = request.getFname()
-                        .toLowerCase()
-                        .replaceAll("[^a-z0-9]", "_");
-                String fileName = sanitizedName + ".jpg";
-
-                Path uploadPath = uploadDir.resolve(fileName);
-                Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-                request.setPhoto(fileName);
-            }
-
-            EmployeeDTO result = empService.createEmployee(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
-
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("File upload failed: " + e.getMessage());
-        }
+        EmployeeDTO result = empService.createEmployee(request, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping
@@ -76,11 +49,7 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(empService.getEmployeeById(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(empService.getEmployeeById(id));
     }
 
     @PutMapping("/{id}")
@@ -89,40 +58,14 @@ public class EmployeeController {
             @RequestPart("employee") EmployeeDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        try {
-            if (file != null && !file.isEmpty()) {
-                Files.createDirectories(uploadDir);
-
-                String sanitizedName = dto.getFname()
-                        .toLowerCase()
-                        .replaceAll("[^a-z0-9]", "_");
-                String fileName = sanitizedName + ".jpg";
-
-                Path uploadPath = uploadDir.resolve(fileName);
-                Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-                dto.setPhoto(fileName);
-            }
-
-            EmployeeDTO result = empService.updateEmployee(id, dto);
-            return ResponseEntity.ok(result);
-
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("File upload failed: " + e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        EmployeeDTO result = empService.updateEmployee(id, dto, file);
+        return ResponseEntity.ok(result);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
-        try {
-            empService.deleteEmployee(id);
-            return ResponseEntity.ok("Employee deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting employee: " + e.getMessage());
-        }
+        empService.deleteEmployee(id);
+        return ResponseEntity.ok("Employee deleted successfully");
     }
 }

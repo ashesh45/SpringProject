@@ -20,7 +20,7 @@ public class AttendanceDto {
     private LocalTime checkOutTime;
     private String status;
 
-    // Employee reference (no circular dependency)
+
     private Long employeeId;
     private String employeeName;
 }
