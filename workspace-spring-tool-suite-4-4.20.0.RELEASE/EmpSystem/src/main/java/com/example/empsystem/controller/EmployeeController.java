@@ -1,6 +1,7 @@
 package com.example.empsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,12 +30,15 @@ public class EmployeeController {
     @Autowired
     private EmployeeService empService;
 
+    @Value("${project.image}")
+    private String path;
+
     @PostMapping
     public ResponseEntity<?> createEmployee(
             @RequestPart("employee") CreateEmployeeRequest request,
             @RequestParam("file") MultipartFile file) {
 
-        EmployeeDTO result = empService.createEmployee(request, file);
+        EmployeeDTO result = empService.createEmployee(request, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
@@ -58,13 +62,13 @@ public class EmployeeController {
             @RequestPart("employee") EmployeeDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        EmployeeDTO result = empService.updateEmployee(id, dto, file);
+        EmployeeDTO result = empService.updateEmployee(id, dto, file, path);
         return ResponseEntity.ok(result);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
         empService.deleteEmployee(id);
         return ResponseEntity.ok("Employee deleted successfully");
     }

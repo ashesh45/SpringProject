@@ -1,10 +1,6 @@
 package com.example.empsystem.serviceImpl;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,14 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.empsystem.dto.DepartmentDto;
 import com.example.empsystem.dto.EmployeeDTO;
 import com.example.empsystem.dto.request.CreateEmployeeRequest;
-import com.example.empsystem.model.Address;
 import com.example.empsystem.model.Department;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.DepartmentRepository;
 import com.example.empsystem.repository.EmployeeRepository;
 import com.example.empsystem.service.EmployeeService;
+import com.example.empsystem.service.FileUploadService;
 
 @Service
 @Transactional
@@ -39,38 +36,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private ModelMapper modelMapper;
 
-    private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "images");
-
-    private String saveFile(MultipartFile file, String name) throws IOException {
-        if (file == null || file.isEmpty()) return null;
-        Files.createDirectories(uploadDir);
-        String sanitizedName = name.toLowerCase().replaceAll("[^a-z0-9]", "_");
-        String fileName = sanitizedName + ".jpg";
-        Path uploadPath = uploadDir.resolve(fileName);
-        Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-        return fileName;
-    }
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Override
-    public EmployeeDTO createEmployee(CreateEmployeeRequest request, MultipartFile file) {
-        String photo = null;
-        try {
-            photo = saveFile(file, request.getFname());
-        } catch (IOException e) {
-            throw new RuntimeException("File upload failed: " + e.getMessage());
+    public EmployeeDTO createEmployee(CreateEmployeeRequest request, MultipartFile file, String path) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String photo = fileUploadService.uploadImage(path, file);
+                request.setPhoto(photo);
+            } catch (IOException e) {
+                throw new RuntimeException("File upload failed: " + e.getMessage());
+            }
         }
-        request.setPhoto(photo);
 
         Employee entity = modelMapper.map(request, Employee.class);
         entity.setPassword(request.getPassword());
-
-        if (request.getAddressName() != null || request.getAddressState() != null || request.getAddressZipcode() != null) {
-            Address address = new Address();
-            address.setName(request.getAddressName());
-            address.setState(request.getAddressState());
-            address.setZipcode(request.getAddressZipcode());
-            entity.setAddress(address);
-        }
 
         if (request.getDepartmentIds() != null && !request.getDepartmentIds().isEmpty()) {
             List<Department> departments = request.getDepartmentIds().stream()
@@ -94,20 +75,41 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<EmployeeDTO> getAllEmployees(Pageable pageable) {
-        return empRepo.findAll(pageable)
-                .map(entity -> modelMapper.map(entity, EmployeeDTO.class));
+
+        Page<Employee> employees = empRepo.findAll(pageable);
+
+        return employees.map(employee -> {
+
+            EmployeeDTO dto = new EmployeeDTO();
+
+            dto.setId(employee.getId());
+            dto.setFname(employee.getFname());
+            dto.setLname(employee.getLname());
+            dto.setUsername(employee.getUsername());
+            dto.setEmail(employee.getEmail());
+
+            if(employee.getDepartments()!=null){
+                dto.setDepartments(
+                    employee.getDepartments()
+                    .stream()
+                    .map(dep -> modelMapper.map(dep, DepartmentDto.class))
+                    .toList()
+                );
+            }
+
+            return dto;
+        });
     }
 
     @Override
-    public EmployeeDTO updateEmployee(Long id, EmployeeDTO dto, MultipartFile file) {
-        String photo = null;
-        try {
-            photo = saveFile(file, dto.getFname());
-        } catch (IOException e) {
-            throw new RuntimeException("File upload failed: " + e.getMessage());
-        }
-        if (photo != null) {
-            dto.setPhoto(photo);
+    public EmployeeDTO updateEmployee(Long id, EmployeeDTO dto, MultipartFile file, String path) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String photo = fileUploadService.uploadImage(path, file);
+                dto.setPhoto(photo);
+            } catch (IOException e) {
+                throw new RuntimeException("File upload failed: " + e.getMessage());
+            }
         }
 
         Employee entity = empRepo.findById(id)
@@ -115,23 +117,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         modelMapper.map(dto, entity);
 
-        if (dto.getAddressName() != null || dto.getAddressState() != null || dto.getAddressZipcode() != null) {
-            Address address = entity.getAddress();
-            if (address == null) {
-                address = new Address();
-                entity.setAddress(address);
-            }
-            address.setName(dto.getAddressName());
-            address.setState(dto.getAddressState());
-            address.setZipcode(dto.getAddressZipcode());
-        }
+        if (dto.getDepartments() != null) {
 
-        if (dto.getDepartmentIds() != null) {
-            List<Department> departments = dto.getDepartmentIds().stream()
-                    .map(deptRepo::findById)
+            List<Department> departments = dto.getDepartments()
+                    .stream()
+                    .map(deptDto -> deptRepo.findById(deptDto.getId()))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
+
             entity.setDepartments(departments);
         }
 
@@ -140,7 +134,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(int id) {
-        empRepo.deleteById((long) id);
+    public void deleteEmployee(Long id) {
+        empRepo.deleteById(id);
     }
 }

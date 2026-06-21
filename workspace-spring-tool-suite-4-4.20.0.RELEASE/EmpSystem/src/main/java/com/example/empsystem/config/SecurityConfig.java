@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.example.empsystem.security.JwtAuthenticationEntryPoint;
 import com.example.empsystem.security.JwtAuthenticationFilter;
 
+
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -43,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/attendance").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/api/employee").hasRole("ADMIN")
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex ->

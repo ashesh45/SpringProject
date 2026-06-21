@@ -27,14 +27,16 @@ public class EmployeeDTO {
     private int salary;
     private LocalDate joinDate;
     private String photo;
+ 
 
     // Address fields (flattened)
     private String addressName;
     private String addressState;
     private String addressZipcode;
 
-    // Department IDs (ManyToMany reference)
-    private List<Integer> departmentIds;
+    private List<DepartmentDto> departments;
+
+  //  private List<Integer> departmentIds;
 
     private String role;
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.empsystem.dto.EmployeeDTO;
+import com.example.empsystem.dto.ProfileDTO;
 import com.example.empsystem.enumm.LeaveStatus;
 import com.example.empsystem.model.Employee;
 import com.example.empsystem.repository.DepartmentRepository;
@@ -45,11 +46,11 @@ public class DashboardController {
     }
 
     @GetMapping("/api/profile")
-    public ResponseEntity<EmployeeDTO> getProfile(Principal principal) {
+    public ResponseEntity<ProfileDTO> getProfile(Principal principal) {
         Employee employee = empRepo.findByUsername(principal.getName());
         if (employee == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(modelMapper.map(employee, EmployeeDTO.class));
+        return ResponseEntity.ok(modelMapper.map(employee, ProfileDTO.class));
     }
 }

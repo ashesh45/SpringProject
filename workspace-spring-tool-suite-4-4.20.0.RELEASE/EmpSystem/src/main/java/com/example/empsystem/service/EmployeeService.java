@@ -9,13 +9,13 @@ import com.example.empsystem.dto.request.CreateEmployeeRequest;
 
 public interface EmployeeService {
 
-    EmployeeDTO createEmployee(CreateEmployeeRequest request, MultipartFile file);
+    EmployeeDTO createEmployee(CreateEmployeeRequest request, MultipartFile file, String path);
 
     EmployeeDTO getEmployeeById(Long id);
 
     Page<EmployeeDTO> getAllEmployees(Pageable pageable);
 
-    EmployeeDTO updateEmployee(Long id, EmployeeDTO dto, MultipartFile file);
+    EmployeeDTO updateEmployee(Long id, EmployeeDTO dto, MultipartFile file, String path);
 
-    void deleteEmployee(int id);
+    void deleteEmployee(Long id);
 }
