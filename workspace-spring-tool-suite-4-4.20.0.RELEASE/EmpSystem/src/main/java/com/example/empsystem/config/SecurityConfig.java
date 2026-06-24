@@ -39,13 +39,10 @@ public class SecurityConfig {
             .formLogin(form -> form.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/api/auth/send-otp").permitAll()
-                .requestMatchers("/api/auth/verify-otp").permitAll()
-                .requestMatchers("/api/auth/change-password").permitAll()
-                .requestMatchers("/api/attendance").hasAnyRole("ADMIN", "EMPLOYEE")
-                .requestMatchers("/api/employee").hasRole("ADMIN")
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/attendance/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                .requestMatchers("/api/employee/**").hasRole("ADMIN")
+                .requestMatchers("/api/payroll/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex ->
